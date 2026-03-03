@@ -41,6 +41,7 @@
           "components/portfolio-table",
           "components/testimonials",
           "components/ethos",
+          "components/dropdown",
           "components/footer",
           "components/dot-navigator"
         ]
