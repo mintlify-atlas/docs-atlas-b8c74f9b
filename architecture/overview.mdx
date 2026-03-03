@@ -1,0 +1,273 @@
+---
+title: 'Application Architecture Overview'
+description: 'Comprehensive guide to the Sunflower Capital website architecture, built with Next.js App Router and ReactPageScroller'
+icon: 'sitemap'
+---
+
+## Overview
+
+The Sunflower Capital website is a modern Next.js application featuring a unique full-page scrolling experience powered by ReactPageScroller. The architecture emphasizes performance, responsive design, and smooth animations.
+
+## Tech Stack
+
+<CardGroup cols={2}>
+  <Card title="Next.js 14" icon="react">
+    App Router with React Server Components
+  </Card>
+  <Card title="TypeScript" icon="code">
+    Type-safe development throughout
+  </Card>
+  <Card title="Tailwind CSS" icon="paintbrush">
+    Utility-first styling with custom config
+  </Card>
+  <Card title="ReactPageScroller" icon="arrows-up-down">
+    Full-page vertical scrolling
+  </Card>
+</CardGroup>
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── page.tsx          # Main application component
+│   ├── layout.tsx        # Root layout with metadata
+│   └── globals.css       # Global styles and animations
+├── components/
+│   ├── PortfolioTable.tsx   # Portfolio filtering and display
+│   ├── Testimonials.tsx     # Client testimonials carousel
+│   ├── DotNavigator.tsx     # Page navigation dots
+│   ├── Ethos.tsx            # Company values (desktop)
+│   ├── DropDown.tsx         # Expandable content sections
+│   └── Footer.tsx           # Footer component
+public/
+├── images/               # SVG assets and graphics
+└── fonts/                # Custom Arya and Bitter fonts
+```
+
+## Core Dependencies
+
+<Tabs>
+  <Tab title="Production">
+    ```json package.json
+    {
+      "dependencies": {
+        "next": "^14.2.14",
+        "react": "^18",
+        "react-dom": "^18",
+        "react-page-scroller": "^3.0.1",
+        "react-device-detect": "^2.2.3",
+        "@vercel/analytics": "^1.5.0",
+        "@next/third-parties": "^15.3.1"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Development">
+    ```json package.json
+    {
+      "devDependencies": {
+        "typescript": "^5",
+        "tailwindcss": "^3.4.10",
+        "autoprefixer": "^10.4.20",
+        "eslint": "^8",
+        "eslint-config-next": "14.2.7"
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Application Flow
+
+The main application (`src/app/page.tsx`) is a client component that manages six distinct full-page sections:
+
+<Steps>
+  <Step title="Hero Section">
+    Animated sunflower garden with brand title and interactive center flower
+  </Step>
+  <Step title="Statement 1">
+    Company mission statement with large typography
+  </Step>
+  <Step title="Ethos">
+    Core values displayed via dropdown (desktop) or stacked cards (mobile)
+  </Step>
+  <Step title="Portfolio">
+    Filterable table of portfolio companies with industry categorization
+  </Step>
+  <Step title="Testimonials">
+    Founder testimonials and feedback
+  </Step>
+  <Step title="Footer/Contact">
+    Contact information and social links
+  </Step>
+</Steps>
+
+## State Management Architecture
+
+The application uses React hooks for state management, with key state variables controlling scroll behavior and UI:
+
+```tsx src/app/page.tsx
+const [loaded, setLoaded] = useState(false);
+const [scrollEnabled, setScrollEnabled] = useState(true);
+const [scrollUpEnabled, setScrollUpEnabled] = useState(true);
+const [scrollDownEnabled, setScrollDownEnabled] = useState(true);
+const [breatheEnabled, setBreatheEnabled] = useState(true);
+const [currentPage, setCurrentPage] = useState(0);
+const [mobile, setMobile] = useState(true);
+const [lg, setLg] = useState(false);
+```
+
+<Info>
+  **Scroll Control Pattern**: Child components (PortfolioTable, Testimonials) receive setters as props to control parent-level scroll behavior when users interact with scrollable content.
+</Info>
+
+### Key State Variables
+
+<AccordionGroup>
+  <Accordion title="Scroll State">
+    - `scrollEnabled`: Master control for all scrolling
+    - `scrollUpEnabled`: Allows scrolling to previous page
+    - `scrollDownEnabled`: Allows scrolling to next page
+    - These are passed to ReactPageScroller via `blockScrollUp` and `blockScrollDown`
+  </Accordion>
+  
+  <Accordion title="UI State">
+    - `loaded`: Controls initial fade-in animations
+    - `breatheEnabled`: Enables/disables breathing animation on center flower
+    - `currentPage`: Tracks active page index (0-5)
+  </Accordion>
+  
+  <Accordion title="Responsive State">
+    - `mobile`: Detected via `react-device-detect` library's `isMobile`
+    - `lg`: Breakpoint tracking for viewport width >= 1024px
+  </Accordion>
+</AccordionGroup>
+
+## Layout and Metadata
+
+The root layout (`src/app/layout.tsx`) provides SEO optimization and analytics:
+
+```tsx src/app/layout.tsx
+export const metadata: Metadata = {
+  title: "Sunflower Capital",
+  description:
+    "We partner at the earliest stage with companies building foundational infrastructure for modern enterprises, critical industries, and the physical world.",
+};
+```
+
+<Tabs>
+  <Tab title="SEO Features">
+    - Open Graph meta tags for social sharing
+    - Twitter Card metadata
+    - Canonical URL definition
+    - Structured data (JSON-LD) for organization
+    - Mobile-optimized viewport settings
+  </Tab>
+  <Tab title="Analytics">
+    ```tsx src/app/layout.tsx
+    import { Analytics } from '@vercel/analytics/next';
+    import { GoogleAnalytics } from '@next/third-parties/google';
+
+    // In component
+    <Analytics />
+    <GoogleAnalytics gaId="G-SR59L3T5LT" />
+    ```
+  </Tab>
+</Tabs>
+
+## Custom Theming
+
+The application uses a custom Tailwind configuration with brand-specific colors and typography:
+
+<CodeGroup>
+```ts tailwind.config.ts
+export default {
+  theme: {
+    fontFamily: {
+      'arya': ['Arya', 'system-ui'],
+      'bitter': ['Bitter', 'system-ui'],
+      'bitter-italic': ['Bitter-italic', 'system-ui']
+    },
+    colors: {
+      'offwhite': '#FFF9DE',
+      'offblack': '#010101',
+      'dark-brown': '#4F3A26',
+      'dark-green': '#03351A',
+      'darkish-brown': '#704F38',
+      'light-grey': '#B9A89A',
+    },
+    screens: {
+      'xs': '425px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1440px',
+      '2xl': '1920px',
+    },
+  },
+}
+```
+
+```css globals.css
+@font-face {
+  font-family: 'Arya';
+  src: url('/fonts/Arya/Arya-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Arya';
+  src: url('/fonts/Arya/Arya-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Bitter';
+  src: url('/fonts/Bitter/Bitter-VariableFont_wght.ttf') format('truetype');
+}
+```
+</CodeGroup>
+
+## Performance Optimizations
+
+<CardGroup cols={2}>
+  <Card title="Image Optimization" icon="image">
+    Next.js `<Image>` component with quality={100} for crisp SVGs
+  </Card>
+  <Card title="Font Loading" icon="font">
+    Preloaded custom fonts to prevent FOUT
+  </Card>
+  <Card title="Lazy Rendering" icon="bolt">
+    `renderAllPagesOnFirstRender={true}` for instant navigation
+  </Card>
+  <Card title="Analytics" icon="chart-line">
+    Vercel Analytics and Google Analytics integration
+  </Card>
+</CardGroup>
+
+## Component Communication Pattern
+
+Components communicate primarily through props and callbacks:
+
+```tsx src/app/page.tsx
+<PortfolioTable
+  setScrollEnabled={setScrollEnabled}
+  setScrollUpEnabled={setScrollUpEnabled}
+  setScrollDownEnabled={setScrollDownEnabled}
+  isMobile={isMobile}
+/>
+```
+
+<Note>
+  This pattern allows child components to temporarily disable page scrolling when users are interacting with internal scrollable areas (like the portfolio table).
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Page Scrolling" icon="arrows-up-down" href="/architecture/page-scrolling">
+    Learn about ReactPageScroller implementation
+  </Card>
+  <Card title="Responsive Design" icon="mobile" href="/architecture/responsive-design">
+    Explore mobile and desktop patterns
+  </Card>
+</CardGroup>

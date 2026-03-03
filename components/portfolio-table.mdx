@@ -1,0 +1,194 @@
+---
+title: Portfolio Table
+description: A filterable portfolio table component displaying companies by industry with custom scroll controls
+---
+
+## Overview
+
+The `PortfolioTable` component displays a comprehensive list of portfolio companies with dynamic filtering by industry. It features a custom scrollbar, mobile-responsive design, and advanced scroll state management for integration with full-page scrolling.
+
+## Props Interface
+
+<ParamField path="setScrollEnabled" type="(enabled: boolean) => void" required>
+  Callback to enable/disable page-level scrolling when interacting with the table
+</ParamField>
+
+<ParamField path="setScrollUpEnabled" type="(enabled: boolean) => void" required>
+  Callback to control upward page scrolling based on table scroll position
+</ParamField>
+
+<ParamField path="setScrollDownEnabled" type="(enabled: boolean) => void" required>
+  Callback to control downward page scrolling based on table scroll position
+</ParamField>
+
+<ParamField path="isMobile" type="boolean" required>
+  Determines whether to render mobile (dropdown) or desktop (button) filters
+</ParamField>
+
+## Data Structure
+
+Each company in the portfolio has the following structure:
+
+```typescript
+interface Company {
+  company: string;      // Company name
+  industry: string;     // Industry category
+  description: string;  // Brief description
+  link: string;        // External company URL
+}
+```
+
+## Features
+
+### Industry Filtering
+
+The component dynamically generates filter options from the company data:
+
+- **Desktop**: Visual button group with checkbox-style indicators
+- **Mobile**: Compact dropdown select menu
+- **Industries**: AI/ML, Crypto, Data, Defense and Hardware, Developer, Fintech, Healthcare & Bio, Infra, SaaS, Security
+
+<CodeGroup>
+```tsx Desktop Filter Usage
+// Desktop shows button group with visual indicators
+<button
+  onClick={() => changeTable("AI/ML")}
+  className="flex flex-row items-center"
+>
+  <div className={`w-3 h-3 rounded-sm ${
+    filter === "AI/ML" ? "bg-offblack" : "bg-[#6D8A54] opacity-20"
+  }`} />
+  AI/ML
+</button>
+```
+
+```tsx Mobile Filter Usage
+// Mobile uses native select dropdown
+<select
+  onChange={(e) => changeTable(e.target.value)}
+  className="font-bitter text-sm w-20 p-1 border border-dark-green"
+>
+  <option value="All">All</option>
+  <option value="AI/ML">AI/ML</option>
+  <option value="Crypto">Crypto</option>
+</select>
+```
+</CodeGroup>
+
+### Scroll State Management
+
+The component uses advanced scroll detection to manage parent page scrolling:
+
+```typescript
+const handleScroll = () => {
+  const firstRect = firstRowRef.current.getBoundingClientRect();
+  const lastRect = lastRowRef.current.getBoundingClientRect();
+  const tableRect = tableBodyRef.current.getBoundingClientRect();
+  
+  // At bottom of table
+  if ((lastRect.bottom - 3) < tableRect.bottom) {
+    setScrollUpEnabled(false);
+    setScrollDownEnabled(true);
+  } 
+  // At top of table
+  else if (firstRect.top === tableRect.top) {
+    setScrollDownEnabled(false);
+    setScrollUpEnabled(true);
+  }
+};
+```
+
+<Note>
+The scroll state callbacks allow ReactPageScroller to know when to allow/block page-level scrolling based on whether the user has reached the top or bottom of the scrollable table.
+</Note>
+
+### Custom Scrollbar Styling
+
+The table applies different scrollbar styles based on device:
+
+- **Desktop**: `custom-scrollbar` class with styled scrollbar
+- **Mobile**: `mobile` class (typically hidden scrollbar)
+
+## Usage Example
+
+From `page.tsx:318-327`:
+
+```tsx
+import PortfolioTable from '@/components/PortfolioTable';
+import { isMobile } from 'react-device-detect';
+
+function Portfolio() {
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+  const [scrollUpEnabled, setScrollUpEnabled] = useState(true);
+  const [scrollDownEnabled, setScrollDownEnabled] = useState(true);
+
+  return (
+    <div className="bg-offwhite min-h-screen flex justify-center items-center">
+      <PortfolioTable
+        setScrollEnabled={setScrollEnabled}
+        setScrollUpEnabled={setScrollUpEnabled}
+        setScrollDownEnabled={setScrollDownEnabled}
+        isMobile={isMobile}
+      />
+    </div>
+  );
+}
+```
+
+## Key Behaviors
+
+<Tabs>
+  <Tab title="Filtering">
+    - Clicking "All" displays all 59 companies sorted alphabetically
+    - Clicking an industry filters to only companies in that category
+    - On desktop, clicking the active filter toggles back to "All"
+    - Filter state persists during table scrolling
+    - Table content animates opacity on filter change (375ms transition)
+  </Tab>
+  
+  <Tab title="Scrolling">
+    - Mouse enter/leave on table disables/enables page scrolling
+    - Touch start/end events manage scroll state on mobile
+    - Refs track first and last visible rows for scroll boundaries
+    - 500ms debounce on scroll enable/disable prevents rapid toggling
+  </Tab>
+  
+  <Tab title="Responsive Layout">
+    - Mobile: Full-width layout with dropdown filter
+    - Desktop: 4/5 width with button group filters
+    - Table height: 60vh on mobile, 70vh on desktop
+    - Company column widths scale from 117px (mobile) to 390px (2xl)
+    - Industry column hidden on smaller screens when filtered
+  </Tab>
+</Tabs>
+
+## Portfolio Data
+
+The component includes data for **59 portfolio companies** including:
+
+- **AI/ML**: Cohere, Comfy, E2B, Letta, Ollama, Roboflow, Tecton, TollBit, Lilt, Waldo
+- **Developer**: Knock, Retool, Tldraw, Vercel, Warp, Fillout, VoidZero
+- **Crypto**: Monad, Nebra, Scroll, Exo, TipLink, Turnkey
+- **Data**: DBT, PostHog, Statsig, Tabular (Databricks), Rerun, Omni
+- **Fintech**: Accrue Savings, AgentSync, Houm, Taktile, Inscribe, Flock Homes
+- **Infrastructure**: Cal, Railway, Temporal, Xata
+
+<Info>
+Companies are alphabetically sorted and each links to their external website. Descriptions provide concise value propositions.
+</Info>
+
+## Styling Notes
+
+- Primary font: `font-bitter` (body text) and `font-arya` (headings)
+- Color scheme: `text-dark-green` on `bg-offwhite`
+- Hover states: Background opacity change with underline on links
+- Responsive text sizing: Uses custom scale (b5xs to bmd, tmd to txl)
+
+## Source Reference
+
+**Component**: `src/components/PortfolioTable.tsx` (285 lines)
+
+**Key Dependencies**:
+- React hooks: `useState`, `useEffect`, `useRef`, `useMemo`
+- Responsive design with Tailwind breakpoints
+- Custom scrollbar CSS classes

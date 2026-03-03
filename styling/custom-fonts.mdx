@@ -1,0 +1,252 @@
+---
+title: 'Custom Fonts'
+description: 'Loading and using Arya and Bitter custom fonts in the Sunflower Capital website'
+---
+
+## Overview
+
+The Sunflower Capital website uses two custom font families to create a distinctive typographic hierarchy:
+
+- **Arya** - Used for headings and display text
+- **Bitter** - Used for body text and readable content
+
+Both fonts are loaded locally from the `/public/fonts` directory and configured via CSS `@font-face` declarations.
+
+## Font Loading
+
+Font faces are defined in `src/app/globals.css` using the `@layer base` directive:
+
+```css globals.css
+@layer base {
+  @font-face {
+    font-family: 'Arya';
+    src: url('/fonts/Arya/Arya-Regular.ttf') format('truetype');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'Arya';
+    src: url('/fonts/Arya/Arya-Bold.ttf') format('truetype');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'Bitter';
+    src: url('/fonts/Bitter/Bitter-VariableFont_wght.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Bitter-italic';
+    src: url('/fonts/Bitter/Bitter-Italic-VariableFont_wght.ttf') format('truetype');
+  }
+}
+```
+
+<Note>
+Using `@layer base` ensures font declarations are included in Tailwind's base layer, loaded before components and utilities.
+</Note>
+
+## Font Directory Structure
+
+```
+public/
+└── fonts/
+    ├── Arya/
+    │   ├── Arya-Regular.ttf
+    │   └── Arya-Bold.ttf
+    └── Bitter/
+        ├── Bitter-VariableFont_wght.ttf
+        └── Bitter-Italic-VariableFont_wght.ttf
+```
+
+## Tailwind Configuration
+
+The fonts are registered in `tailwind.config.ts` for use with utility classes:
+
+```typescript tailwind.config.ts
+fontFamily: {
+  'arya': ['Arya', 'system-ui'],
+  'bitter': ['Bitter', 'system-ui'],
+  'bitter-italic': ['Bitter-italic', 'system-ui']
+}
+```
+
+Each font family includes `system-ui` as a fallback in case the custom font fails to load.
+
+## Usage
+
+### Arya Font (Headings)
+
+Use `font-arya` for headings and display text:
+
+<CodeGroup>
+```jsx Regular Weight (400)
+<h1 className="font-arya text-txl text-offwhite">
+  Sunflower Capital
+</h1>
+```
+
+```jsx Bold Weight (700)
+<h2 className="font-arya font-bold text-tlg text-dark-brown">
+  Investment Philosophy
+</h2>
+```
+</CodeGroup>
+
+### Bitter Font (Body Text)
+
+Use `font-bitter` for body text and readable content:
+
+<CodeGroup>
+```jsx Regular Bitter
+<p className="font-bitter text-b3xs text-offwhite">
+  We invest in companies that align with our values
+  and demonstrate sustainable growth potential.
+</p>
+```
+
+```jsx Italic Variant
+<em className="font-bitter-italic text-b3xs text-light-grey">
+  Emphasis text with italic styling
+</em>
+```
+</CodeGroup>
+
+## Font Weights
+
+### Arya
+
+| Weight | Class | Value |
+|--------|-------|-------|
+| Regular | `font-normal` | 400 |
+| Bold | `font-bold` | 700 |
+
+### Bitter (Variable Font)
+
+Bitter uses a variable font file, which supports a range of weights:
+
+```jsx
+<p className="font-bitter font-light">Light weight (300)</p>
+<p className="font-bitter font-normal">Normal weight (400)</p>
+<p className="font-bitter font-medium">Medium weight (500)</p>
+<p className="font-bitter font-semibold">Semibold (600)</p>
+<p className="font-bitter font-bold">Bold weight (700)</p>
+```
+
+<Accordion title="What is a Variable Font?">
+Variable fonts contain multiple font weights in a single file, allowing you to use any weight value between the minimum and maximum supported range. This reduces the number of font files needed and provides more typographic flexibility.
+
+The Bitter variable font likely supports weights from 100-900, though the specific range depends on the font file.
+</Accordion>
+
+## Performance Considerations
+
+### Font Loading Strategy
+
+<Steps>
+  <Step title="Preload Critical Fonts">
+    Consider preloading fonts used above the fold:
+    
+    ```html
+    <link rel="preload" href="/fonts/Arya/Arya-Bold.ttf" as="font" type="font/ttf" crossorigin />
+    ```
+  </Step>
+  
+  <Step title="Font Display Strategy">
+    Add `font-display` to `@font-face` declarations:
+    
+    ```css
+    @font-face {
+      font-family: 'Arya';
+      src: url('/fonts/Arya/Arya-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-display: swap; /* Show fallback immediately */
+    }
+    ```
+  </Step>
+  
+  <Step title="Subset Fonts">
+    For production, consider subsetting font files to include only the glyphs you need, reducing file size.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Fonts not loading">
+    1. Verify font files exist in `/public/fonts/`
+    2. Check browser console for 404 errors
+    3. Ensure paths in `@font-face` are correct (relative to `/public`)
+    4. Clear browser cache and hard reload
+  </Accordion>
+  
+  <Accordion title="Italic not working with Bitter">
+    Use the `font-bitter-italic` class instead of `font-bitter italic`:
+    
+    ```jsx
+    {/* Correct */}
+    <em className="font-bitter-italic">Italic text</em>
+    
+    {/* Won't work as expected */}
+    <em className="font-bitter italic">Italic text</em>
+    ```
+  </Accordion>
+  
+  <Accordion title="Font weights not working">
+    For Arya, only weights 400 and 700 are loaded. Use `font-normal` or `font-bold`.
+    
+    For Bitter, the variable font should support all weights. If not working:
+    - Verify the font file is a true variable font
+    - Check browser compatibility with variable fonts
+  </Accordion>
+</AccordionGroup>
+
+## Adding New Fonts
+
+To add a new custom font:
+
+<Steps>
+  <Step title="Add font files">
+    Place `.ttf`, `.woff`, or `.woff2` files in `/public/fonts/[font-name]/`
+  </Step>
+  
+  <Step title="Add @font-face declarations">
+    In `src/app/globals.css`:
+    
+    ```css
+    @layer base {
+      @font-face {
+        font-family: 'NewFont';
+        src: url('/fonts/NewFont/NewFont-Regular.ttf') format('truetype');
+        font-weight: 400;
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Register in Tailwind config">
+    In `tailwind.config.ts`:
+    
+    ```typescript
+    fontFamily: {
+      'arya': ['Arya', 'system-ui'],
+      'bitter': ['Bitter', 'system-ui'],
+      'new-font': ['NewFont', 'system-ui'], // Add here
+    }
+    ```
+  </Step>
+  
+  <Step title="Use in components">
+    ```jsx
+    <p className="font-new-font">Text in new font</p>
+    ```
+  </Step>
+</Steps>
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Tailwind Configuration" icon="palette" href="/styling/tailwind-configuration">
+    Font sizes, colors, and theme customization
+  </Card>
+  <Card title="Animations" icon="wand-magic-sparkles" href="/styling/animations">
+    CSS animations and interactive effects
+  </Card>
+</CardGroup>

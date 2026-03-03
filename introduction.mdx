@@ -1,0 +1,325 @@
+---
+title: Introduction
+description: Build and deploy the Sunflower Capital venture capital website with Next.js 14, featuring full-page scrolling and interactive animations
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.svg"
+  alt="Sunflower Capital Hero"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.svg"
+  alt="Sunflower Capital Hero"
+/>
+
+## Welcome to Sunflower Capital
+
+Sunflower Capital is a modern, interactive venture capital website built with Next.js 14. The site showcases a beautiful full-page scrolling experience with animated flower visuals, portfolio filtering, and testimonials carousel.
+
+<Note>
+  **From Seed to Sunflower** - This website represents Sunflower Capital's mission to partner at the earliest stage with companies building foundational infrastructure for modern enterprises, critical industries, and the physical world.
+</Note>
+
+## Key features
+
+This Next.js application combines cutting-edge web technologies with thoughtful UX design:
+
+<CardGroup cols={2}>
+  <Card
+    title="Full-page scrolling"
+    icon="scroll"
+    href="#architecture"
+  >
+    Built with ReactPageScroller for seamless vertical navigation through content sections
+  </Card>
+  <Card
+    title="Interactive animations"
+    icon="sparkles"
+    href="#animations"
+  >
+    Animated sunflower visuals with hover effects, growth animations, and breathing effects
+  </Card>
+  <Card
+    title="Dynamic portfolio"
+    icon="briefcase"
+    href="#portfolio-system"
+  >
+    Filterable portfolio table with 56+ companies across AI/ML, Fintech, Security, and more
+  </Card>
+  <Card
+    title="Responsive design"
+    icon="mobile"
+    href="#responsive-approach"
+  >
+    Adaptive layouts for portrait/landscape orientations with device detection
+  </Card>
+</CardGroup>
+
+## Architecture
+
+The website is built as a client-side React application using Next.js 14 with the App Router. Here's how the main components are structured:
+
+### Page structure
+
+The application uses a full-page scroller with six distinct sections:
+
+```tsx src/app/page.tsx
+<ReactPageScroller
+  customPageNumber={currentPage}
+  blockScrollUp={!scrollEnabled && !scrollUpEnabled} 
+  blockScrollDown={!scrollEnabled && !scrollDownEnabled}
+  onBeforePageScroll={beforePageChange}
+  renderAllPagesOnFirstRender={true}
+>
+  {/* Hero section with animated flowers */}
+  <div id="hero" className="...">
+    {/* Sunflower Capital title and flower animations */}
+  </div>
+  
+  {/* Mission statement */}
+  <div id="statement1" className="...">
+    {/* Company mission */}
+  </div>
+  
+  {/* Ethos section */}
+  <div id="statement2" className="...">
+    {/* Investment philosophy */}
+  </div>
+  
+  {/* Portfolio table */}
+  <div id="portfolio" className="...">
+    <PortfolioTable />
+  </div>
+  
+  {/* Testimonials carousel */}
+  <div id="testimonials" className="...">
+    <Testimonials />
+  </div>
+  
+  {/* Contact footer */}
+  <div id="footer" className="...">
+    {/* Contact information and social links */}
+  </div>
+</ReactPageScroller>
+```
+
+### Custom brand colors
+
+Sunflower Capital uses a distinctive color palette defined in Tailwind config:
+
+```ts tailwind.config.ts
+colors: {
+  'offwhite': '#FFF9DE',
+  'offblack': '#010101',
+  'dark-brown': '#4F3A26',
+  'dark-green': '#03351A',  // Primary brand color
+  'white': '#FFFFFF',
+  'darkish-brown': '#704F38',
+  'light-grey': '#B9A89A',
+}
+```
+
+## Animations
+
+The hero section features multiple animated sunflower SVGs with different interaction patterns:
+
+### Breathing center flower
+
+The central flower has a continuous breathing animation:
+
+```css src/app/globals.css
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.breathe {
+  animation: breathe 3s ease-in-out infinite; 
+}
+```
+
+### Interactive expand effect
+
+Clicking the center flower triggers a dramatic expand animation:
+
+```tsx src/app/page.tsx
+const expandFlower = () => {
+  if (!breatheEnabled) return;
+  setBreatheEnabled(false);
+  const centerflower = document.getElementById("center-flower");
+  
+  setTimeout(() => {
+    centerflower.style.transition = "transform 2s ease-in-out";
+    if (window.innerHeight > window.innerWidth) {
+      centerflower.style.transform = "scale(160)";
+    } else {
+      centerflower.style.transform = "scale(80)";
+    }
+  }, 10);
+  
+  // Show message "From Seed to Sunflower"
+  // Reset after animation completes
+};
+```
+
+## Portfolio system
+
+The portfolio table manages 56+ portfolio companies with dynamic filtering:
+
+<CodeGroup>
+```tsx Company interface
+interface Company {
+  company: string;
+  industry: string;
+  description: string;
+  link: string;
+}
+```
+
+```tsx Filter implementation
+const industries = [
+  'AI/ML', 'Crypto', 'Data', 'Defense and Hardware',
+  'Developer', 'Fintech', 'Healthcare & Bio',
+  'Infra', 'SaaS', 'Security'
+];
+
+const changeTable = (filter: string) => {
+  const filteredCompanies = filter === 'All' 
+    ? companies 
+    : companies.filter(company => company.industry === filter);
+  setDisplayCompanies(filteredCompanies);
+};
+```
+</CodeGroup>
+
+### Sample portfolio companies
+
+<AccordionGroup>
+  <Accordion title="AI/ML companies">
+    - **Cohere** - LLMs and RAG capabilities for enterprises
+    - **Ollama** - Easiest way to get up and running with LLMs
+    - **Roboflow** - Build and deploy computer vision models faster
+    - **Tecton** - Abstracting away data engineering for AI
+  </Accordion>
+  <Accordion title="Developer tools">
+    - **Vercel** - The frontend cloud for a faster, personalized web
+    - **Retool** - Fastest way to build internal software
+    - **Warp** - The modern terminal, reimagined with AI
+    - **VoidZero** - Unified toolchain for Javascript
+  </Accordion>
+  <Accordion title="Infrastructure">
+    - **Temporal** - Open source durable execution
+    - **Railway** - Deploy software instantly at scale
+    - **Cal** - Open source scheduling infrastructure
+    - **Xata** - Serverless data platform for PostgreSQL
+  </Accordion>
+</AccordionGroup>
+
+## Responsive approach
+
+The site uses a sophisticated responsive system based on aspect ratios and device detection:
+
+```tsx src/app/page.tsx
+const [mobile, setMobile] = useState(true);
+const [lg, setLg] = useState(false);
+
+useEffect(() => {
+  const handleResize = () => {
+    setLg(window.innerWidth >= 1024);
+  };
+  setMobile(isMobile);
+  setLg(window.innerWidth >= 1024);
+  
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+```
+
+### Breakpoints
+
+Custom screen breakpoints ensure perfect display across devices:
+
+```ts tailwind.config.ts
+screens: {
+  'xs': '425px',
+  'sm': '640px',
+  'md': '768px',
+  'lg': '1024px',
+  'xl': '1440px',
+  '2xl': '1920px',
+}
+```
+
+## Typography
+
+The site uses two custom font families:
+
+<CardGroup cols={2}>
+  <Card title="Arya" icon="font">
+    Used for headings and the main title. Bold, distinctive, perfect for brand identity.
+    
+    ```css
+    font-family: 'Arya', system-ui
+    ```
+  </Card>
+  <Card title="Bitter" icon="text">
+    Used for body text and descriptions. Variable font with weights from 100-900.
+    
+    ```css
+    font-family: 'Bitter', system-ui
+    ```
+  </Card>
+</CardGroup>
+
+## Tech stack
+
+<Steps>
+  <Step title="Next.js 14">
+    Modern React framework with App Router, Image optimization, and font loading
+  </Step>
+  <Step title="React 18">
+    Latest React with hooks, concurrent features, and client components
+  </Step>
+  <Step title="TypeScript 5">
+    Type-safe development with modern TypeScript features
+  </Step>
+  <Step title="Tailwind CSS 3.4">
+    Utility-first CSS with custom configuration for brand colors and typography
+  </Step>
+  <Step title="ReactPageScroller 3.0">
+    Full-page scrolling library for seamless section navigation
+  </Step>
+  <Step title="Glide.js 3.6">
+    Lightweight carousel for testimonials with touch support
+  </Step>
+  <Step title="Vercel Analytics">
+    Built-in analytics for tracking user behavior and performance
+  </Step>
+</Steps>
+
+## Next steps
+
+Ready to get started? Follow the quickstart guide to set up your development environment and run the site locally.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Clone the repository and start the development server in minutes
+  </Card>
+  <Card
+    title="Deployment"
+    icon="cloud"
+    href="/deployment/vercel"
+  >
+    Deploy to Vercel with automatic CI/CD and preview deployments
+  </Card>
+</CardGroup>

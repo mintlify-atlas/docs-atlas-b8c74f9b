@@ -1,0 +1,354 @@
+---
+title: 'Analytics Setup'
+description: 'Configure Vercel Analytics and Google Analytics 4 for comprehensive website tracking'
+icon: 'chart-line'
+---
+
+## Overview
+
+The Sunflower Capital website integrates two analytics solutions:
+- **Vercel Analytics** - Privacy-friendly, zero-config web vitals tracking
+- **Google Analytics 4** - Comprehensive user behavior and traffic analysis
+
+## Current Implementation
+
+Both analytics providers are integrated in the root layout:
+
+```tsx src/app/layout.tsx
+import { Analytics } from '@vercel/analytics/next';
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} bg-offwhite`}>
+        <main role="main" className="min-h-screen flex flex-col items-center justify-center">
+          {children}
+          <Analytics />
+        </main>
+        <GoogleAnalytics gaId="G-SR59L3T5LT" />
+      </body>
+    </html>
+  );
+}
+```
+
+## Vercel Analytics
+
+### Features
+
+<CardGroup cols={2}>
+  <Card title="Web Vitals" icon="gauge-high">
+    Track Core Web Vitals (LCP, FID, CLS)
+  </Card>
+  <Card title="Privacy-First" icon="shield-halved">
+    GDPR compliant, no cookies required
+  </Card>
+  <Card title="Zero Config" icon="bolt">
+    Works automatically on Vercel deployments
+  </Card>
+  <Card title="Real User Data" icon="users">
+    Monitor actual user experience metrics
+  </Card>
+</CardGroup>
+
+### Installation
+
+The package is already installed:
+
+```json package.json
+{
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0"
+  }
+}
+```
+
+### Setup Steps
+
+<Steps>
+  <Step title="Component Already Integrated">
+    The `<Analytics />` component is already added to `layout.tsx` (line 96).
+    No additional configuration needed!
+  </Step>
+
+  <Step title="Enable in Vercel Dashboard">
+    1. Go to your project in Vercel
+    2. Navigate to "Analytics" tab
+    3. Click "Enable Analytics"
+    4. Free tier includes 1 million events/month
+  </Step>
+
+  <Step title="View Analytics">
+    Analytics data appears in your Vercel dashboard after deployment:
+    - Web Vitals scores
+    - Page performance
+    - Traffic by route
+    - Geographic distribution
+  </Step>
+</Steps>
+
+<Info>
+Vercel Analytics starts collecting data immediately after enabling. No code changes required beyond the initial `<Analytics />` component.
+</Info>
+
+### Development Mode
+
+By default, Vercel Analytics only runs in production. To enable in development:
+
+```tsx Optional: Enable in Development
+import { Analytics } from '@vercel/analytics/next';
+
+<Analytics mode="development" />
+```
+
+<Warning>
+Development mode tracking can inflate your event quota. Only enable for testing.
+</Warning>
+
+## Google Analytics 4
+
+### Current Configuration
+
+The site uses Google Analytics with ID: `G-SR59L3T5LT`
+
+```tsx src/app/layout.tsx (line 98)
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+<GoogleAnalytics gaId="G-SR59L3T5LT" />
+```
+
+### Package Details
+
+Using Next.js official Google Analytics integration:
+
+```json package.json
+{
+  "dependencies": {
+    "@next/third-parties": "^15.3.1"
+  }
+}
+```
+
+<Check>
+This package provides optimized, performance-friendly Google Analytics integration specifically designed for Next.js applications.
+</Check>
+
+### Environment Variable Configuration (Recommended)
+
+For better configuration management, consider moving the GA ID to an environment variable:
+
+<Steps>
+  <Step title="Update Layout Component">
+    ```tsx src/app/layout.tsx
+    <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
+    ```
+  </Step>
+
+  <Step title="Add Environment Variable Locally">
+    Create `.env.local` in project root:
+    
+    ```bash .env.local
+    NEXT_PUBLIC_GA_ID=G-SR59L3T5LT
+    ```
+  </Step>
+
+  <Step title="Configure in Vercel">
+    Add to Vercel project settings:
+    1. Go to Project Settings → Environment Variables
+    2. Add variable:
+       - **Key**: `NEXT_PUBLIC_GA_ID`
+       - **Value**: `G-SR59L3T5LT`
+       - **Environments**: Production, Preview, Development
+    3. Redeploy to apply changes
+  </Step>
+</Steps>
+
+<Warning>
+Environment variables starting with `NEXT_PUBLIC_` are exposed to the browser. Never store sensitive data in them.
+</Warning>
+
+### Features Tracked
+
+With this integration, Google Analytics automatically tracks:
+
+- Page views (including SPA navigation)
+- User sessions and demographics
+- Traffic sources and referrals
+- Device and browser information
+- Geographic location
+- User engagement metrics
+
+### Viewing Analytics Data
+
+<Steps>
+  <Step title="Access Google Analytics">
+    1. Go to [analytics.google.com](https://analytics.google.com)
+    2. Select your property (Sunflower Capital)
+    3. View real-time and historical reports
+  </Step>
+
+  <Step title="Key Reports">
+    Navigate to these useful reports:
+    - **Realtime** → Monitor live visitors
+    - **Acquisition** → Traffic sources
+    - **Engagement** → Page views and events
+    - **Demographics** → User characteristics
+  </Step>
+</Steps>
+
+## Privacy Considerations
+
+<AccordionGroup>
+  <Accordion title="GDPR Compliance">
+    Google Analytics 4 is GDPR compliant when properly configured:
+    - Enable IP anonymization (enabled by default in GA4)
+    - Add privacy policy link to your website
+    - Consider adding cookie consent banner for EU visitors
+    - Configure data retention settings in GA4 admin
+  </Accordion>
+
+  <Accordion title="Cookie Usage">
+    Google Analytics uses cookies to track users:
+    - `_ga` - Distinguishes unique users (expires after 2 years)
+    - `_ga_<container-id>` - Persists session state (expires after 2 years)
+    
+    Vercel Analytics is cookieless and more privacy-friendly.
+  </Accordion>
+
+  <Accordion title="Data Privacy Settings">
+    In your GA4 property settings, review:
+    - Data retention period (default: 2 months)
+    - Google signals (cross-device tracking)
+    - Data sharing settings
+    - User deletion requests handling
+  </Accordion>
+</AccordionGroup>
+
+## Custom Events (Optional)
+
+To track custom interactions, you can add events:
+
+<CodeGroup>
+```tsx Button Click Tracking
+'use client';
+
+import { sendGAEvent } from '@next/third-parties/google';
+
+export function ContactButton() {
+  return (
+    <button
+      onClick={() => sendGAEvent('event', 'contact_click', {
+        category: 'engagement',
+        label: 'Contact Button'
+      })}
+    >
+      Contact Us
+    </button>
+  );
+}
+```
+
+```tsx Portfolio Click Tracking
+'use client';
+
+import { sendGAEvent } from '@next/third-parties/google';
+
+export function PortfolioCard({ company }: { company: string }) {
+  return (
+    <div
+      onClick={() => sendGAEvent('event', 'portfolio_view', {
+        company_name: company
+      })}
+    >
+      {/* Card content */}
+    </div>
+  );
+}
+```
+</CodeGroup>
+
+<Info>
+Custom events require `'use client'` directive since they involve browser interactions.
+</Info>
+
+## Performance Impact
+
+Both analytics solutions are optimized for performance:
+
+<CardGroup cols={2}>
+  <Card title="Vercel Analytics" icon="bolt">
+    - ~1KB gzipped
+    - No impact on Core Web Vitals
+    - Loads asynchronously
+  </Card>
+  <Card title="Google Analytics" icon="google">
+    - ~17KB with @next/third-parties
+    - Script loaded with `afterInteractive` strategy
+    - Minimal render-blocking
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Vercel Analytics Not Showing Data">
+    - Verify Analytics is enabled in Vercel dashboard
+    - Check that `<Analytics />` component is in `layout.tsx`
+    - Wait 24-48 hours for initial data collection
+    - Ensure deployment is on Vercel (not local dev)
+  </Accordion>
+
+  <Accordion title="Google Analytics Not Tracking">
+    - Verify GA ID is correct (`G-SR59L3T5LT`)
+    - Check browser console for errors
+    - Disable ad blockers when testing
+    - View "Realtime" report in GA4 for immediate verification
+    - Ensure `@next/third-parties` package is installed
+  </Accordion>
+
+  <Accordion title="Analytics in Development">
+    Neither analytics service tracks development by default:
+    - Vercel Analytics: Add `mode="development"` prop
+    - Google Analytics: Will track but may be blocked by browser extensions
+    - Consider using separate GA4 properties for dev/prod
+  </Accordion>
+</AccordionGroup>
+
+## Analytics Comparison
+
+| Feature | Vercel Analytics | Google Analytics 4 |
+|---------|------------------|--------------------|
+| **Privacy** | Cookieless, GDPR-friendly | Cookie-based |
+| **Setup** | Zero config | Requires GA ID |
+| **Web Vitals** | Built-in | Manual setup needed |
+| **User Journeys** | Limited | Comprehensive |
+| **Custom Events** | Basic | Advanced |
+| **Cost** | Free tier: 1M events/mo | Free (unlimited) |
+| **Data Ownership** | Vercel | Google |
+| **Real-time** | Limited | Full real-time dashboard |
+
+<Info>
+Using both provides the best of both worlds: privacy-friendly web vitals monitoring plus comprehensive user behavior analytics.
+</Info>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Vercel Deployment" icon="rocket" href="/deployment/vercel">
+    Learn how to deploy to Vercel
+  </Card>
+  <Card title="Vercel Analytics Docs" icon="chart-simple" href="https://vercel.com/docs/analytics">
+    Official Vercel Analytics documentation
+  </Card>
+  <Card title="GA4 Documentation" icon="google" href="https://support.google.com/analytics">
+    Google Analytics 4 help center
+  </Card>
+  <Card title="Next.js Third Parties" icon="code" href="https://nextjs.org/docs/app/building-your-application/optimizing/third-party-libraries">
+    Optimize third-party scripts
+  </Card>
+</CardGroup>

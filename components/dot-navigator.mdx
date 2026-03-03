@@ -1,0 +1,387 @@
+---
+title: Dot Navigator
+description: A dot-based navigation component for full-page scrolling with dynamic styling
+---
+
+## Overview
+
+The `DotNavigator` component provides visual navigation dots for a full-page scrolling experience. It displays 6 dots representing each section of the site, with dynamic styling based on the current scroll position.
+
+## Props Interface
+
+<ParamField path="currentScreen" type="number" required>
+  The index (0-5) of the currently visible screen/section
+</ParamField>
+
+<ParamField path="onDotClick" type="(index: number) => void" required>
+  Callback function triggered when a dot is clicked to navigate to that section
+</ParamField>
+
+<ParamField path="isMobile" type="boolean" required>
+  Mobile device detection flag (currently passed but not actively used in component)
+</ParamField>
+
+## Features
+
+### Dynamic Dot Count
+
+The component renders a fixed number of navigation dots:
+
+```typescript
+const totalScreens = 6;
+
+return (
+  <div className="dot-container">
+    {Array.from({ length: totalScreens }).map((_, index) => (
+      <img key={index} src="..." className="dot" />
+    ))}
+  </div>
+);
+```
+
+### Conditional Styling
+
+Dots change appearance based on three states:
+
+<CodeGroup>
+```typescript Current Screen (Active)
+if (currentScreen === index) {
+  return 'scale-150 opacity-100';
+}
+```
+
+```typescript First/Last Screen (Inactive)
+else if ((currentScreen === 0 || currentScreen === 5) && currentScreen !== index) {
+  return 'scale-100 hover:scale-125 opacity-20';
+}
+```
+
+```typescript Middle Screens (Inactive)
+else {
+  return 'scale-100 hover:scale-125 opacity-50';
+}
+```
+</CodeGroup>
+
+<Note>
+Inactive dots on the hero (screen 0) and contact (screen 5) pages have lower opacity (20%) compared to middle sections (50%) for better visual contrast against the dark green background.
+</Note>
+
+### Dynamic Icon Selection
+
+The dot color changes based on the current screen:
+
+```typescript
+<img
+  src={(currentScreen === 0 || currentScreen === 5) 
+    ? '/images/dot1.svg'  // Light dots for dark backgrounds
+    : '/images/dot2.svg'  // Dark dots for light backgrounds
+  }
+  alt={`dot ${index}`}
+/>
+```
+
+## Usage Example
+
+From `page.tsx:90-91`:
+
+```tsx
+import DotNavigator from '@/components/DotNavigator';
+import { isMobile } from 'react-device-detect';
+
+function App() {
+  const [currentPage, setCurrentPage] = useState(0);
+  
+  const beforePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  return (
+    <>
+      {/* Only render on desktop */}
+      {!isMobile && (
+        <DotNavigator 
+          currentScreen={currentPage} 
+          onDotClick={beforePageChange} 
+          isMobile={isMobile} 
+        />
+      )}
+      
+      <ReactPageScroller
+        customPageNumber={currentPage}
+        onBeforePageScroll={beforePageChange}
+      >
+        {/* Page sections */}
+      </ReactPageScroller>
+    </>
+  );
+}
+```
+
+<Warning>
+The dot navigator only renders on desktop devices (`!isMobile`). Mobile users navigate through standard touch scrolling without visual dot indicators.
+</Warning>
+
+## Screen Mapping
+
+The 6 screens correspond to:
+
+<Steps>
+  <Step title="Screen 0: Hero">
+    Dark green background with animated flowers
+    - Dot icon: `dot1.svg` (light)
+    - Background: `bg-dark-green`
+  </Step>
+  
+  <Step title="Screen 1: Statement 1">
+    Mission statement on light background
+    - Dot icon: `dot2.svg` (dark)
+    - Background: `bg-offwhite`
+  </Step>
+  
+  <Step title="Screen 2: Ethos">
+    Investment philosophy accordion
+    - Dot icon: `dot2.svg` (dark)
+    - Background: `bg-offwhite`
+  </Step>
+  
+  <Step title="Screen 3: Portfolio">
+    Filterable portfolio table
+    - Dot icon: `dot2.svg` (dark)
+    - Background: `bg-offwhite`
+  </Step>
+  
+  <Step title="Screen 4: Testimonials">
+    Founder testimonials carousel
+    - Dot icon: `dot2.svg` (dark)
+    - Background: `bg-offwhite`
+  </Step>
+  
+  <Step title="Screen 5: Contact">
+    Contact links and footer
+    - Dot icon: `dot1.svg` (light)
+    - Background: `bg-dark-green`
+  </Step>
+</Steps>
+
+## Component Structure
+
+```tsx
+import React from 'react';
+
+interface DotNavigatorProps {
+  currentScreen: number;
+  onDotClick: (index: number) => void;
+  isMobile: boolean;
+}
+
+const DotNavigator: React.FC<DotNavigatorProps> = ({ currentScreen, onDotClick, isMobile }) => {
+  const totalScreens = 6;
+
+  return (
+    <div className={`dot-container flex gap-2 p-4 rounded-full transition-all duration-1000 ${
+      currentScreen === 0 || currentScreen === 5 ? 'bg-dark-green' : ''
+    }`}>
+      {Array.from({ length: totalScreens }).map((_, index) => {
+        const dotClass = (() => {
+          if (currentScreen === index) {
+            return 'scale-150 opacity-100';
+          } else if ((currentScreen === 0 || currentScreen === 5) && currentScreen !== index) {
+            return 'scale-100 hover:scale-125 opacity-20';
+          } else {
+            return 'scale-100 hover:scale-125 opacity-50';
+          }
+        })();
+
+        return (
+          <img
+            key={index}
+            src={(currentScreen === 0 || currentScreen === 5) ? '/images/dot1.svg' : '/images/dot2.svg'}
+            alt={`dot ${index}`}
+            className={`dot ${dotClass} transition-all duration-300 hover:cursor-pointer`}
+            onClick={() => onDotClick(index)}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+export default DotNavigator;
+```
+
+## Styling Details
+
+<Tabs>
+  <Tab title="Container">
+    **Base Styles**:
+    - Display: `flex`
+    - Gap: `gap-2` (8px between dots)
+    - Padding: `p-4` (16px all sides)
+    - Shape: `rounded-full` (pill shape)
+    
+    **Dynamic Background**:
+    - Hero/Contact: `bg-dark-green`
+    - Other sections: No background (transparent)
+    - Transition: `duration-1000` (1 second fade)
+  </Tab>
+  
+  <Tab title="Dots">
+    **Base Styles**:
+    - Class: `dot` (custom sizing via CSS)
+    - Cursor: `hover:cursor-pointer`
+    - Transition: `transition-all duration-300`
+    
+    **Active State** (current screen):
+    - Scale: `scale-150` (1.5x size)
+    - Opacity: `opacity-100` (fully visible)
+    
+    **Inactive State**:
+    - Scale: `scale-100` (normal size)
+    - Hover: `hover:scale-125` (1.25x on hover)
+    - Opacity: `opacity-20` (first/last) or `opacity-50` (middle)
+  </Tab>
+  
+  <Tab title="Icons">
+    **dot1.svg** (light colored):
+    - Used on screens 0 and 5
+    - Dark green background pages
+    - High contrast for visibility
+    
+    **dot2.svg** (dark colored):
+    - Used on screens 1-4
+    - Off-white background pages
+    - Matches text color scheme
+  </Tab>
+</Tabs>
+
+## Interaction Behavior
+
+<AccordionGroup>
+  <Accordion title="Click Navigation">
+    **Behavior**:
+    1. User clicks any dot
+    2. `onDotClick(index)` callback fires
+    3. Parent component updates `currentPage` state
+    4. ReactPageScroller navigates to that section
+    5. Active dot scales up and others fade
+    
+    **Smooth Scrolling**:
+    - ReactPageScroller handles smooth page transitions
+    - Dot transitions occur simultaneously (300ms)
+    - Container background fades over 1 second
+  </Accordion>
+  
+  <Accordion title="Hover Effects">
+    **Inactive Dots**:
+    - Cursor changes to pointer
+    - Scale increases from 100% to 125%
+    - 300ms transition duration
+    - Opacity remains constant during hover
+    
+    **Active Dot**:
+    - No hover effect (already scaled to 150%)
+    - Cursor still shows pointer
+  </Accordion>
+  
+  <Accordion title="Visual Feedback">
+    **Current Position**:
+    - Active dot clearly visible at 150% scale
+    - 100% opacity vs 20-50% for others
+    
+    **Navigation Options**:
+    - Inactive dots indicate available sections
+    - Hover state shows interactivity
+    - Smooth transitions provide feedback
+  </Accordion>
+</AccordionGroup>
+
+## Responsive Behavior
+
+**Desktop Only**:
+```tsx
+{!isMobile && <DotNavigator ... />}
+```
+
+**Why Desktop Only?**
+- Mobile uses native touch scrolling
+- Dots would clutter small screens
+- ReactPageScroller optimized for desktop full-page scrolling
+- Mobile users can swipe naturally without visual indicators
+
+## CSS Classes Breakdown
+
+```css
+/* Container */
+.dot-container {
+  display: flex;
+  gap: 0.5rem;              /* gap-2 */
+  padding: 1rem;            /* p-4 */
+  border-radius: 9999px;    /* rounded-full */
+  transition: all 1000ms;   /* transition-all duration-1000 */
+}
+
+/* Individual dots */
+.dot {
+  transition: all 300ms;    /* transition-all duration-300 */
+  cursor: pointer;          /* hover:cursor-pointer */
+}
+
+/* State classes (applied dynamically) */
+.scale-150 { transform: scale(1.5); }
+.scale-125 { transform: scale(1.25); }
+.scale-100 { transform: scale(1); }
+.opacity-100 { opacity: 1; }
+.opacity-50 { opacity: 0.5; }
+.opacity-20 { opacity: 0.2; }
+```
+
+## Integration with ReactPageScroller
+
+```tsx
+<ReactPageScroller
+  customPageNumber={currentPage}           // Controlled by DotNavigator clicks
+  onBeforePageScroll={beforePageChange}    // Updates currentScreen prop
+  renderAllPagesOnFirstRender={true}
+>
+  {/* 6 page sections */}
+</ReactPageScroller>
+```
+
+**Data Flow**:
+1. User clicks dot → `onDotClick(index)` fires
+2. Parent updates `currentPage` state
+3. ReactPageScroller scrolls to new page
+4. `onBeforePageScroll` callback confirms page change
+5. DotNavigator re-renders with new `currentScreen`
+6. Active dot updates with scale/opacity transitions
+
+## Accessibility Considerations
+
+<CardGroup cols={2}>
+  <Card title="Pros" icon="check">
+    - Clickable navigation
+    - Visual feedback on hover
+    - Clear active state indicator
+    - Alt text on dot images
+  </Card>
+  
+  <Card title="Improvements" icon="lightbulb">
+    - Could use `<button>` instead of `<img>`
+    - Add ARIA labels for screen readers
+    - Keyboard navigation support (tab + enter)
+    - Focus visible states
+  </Card>
+</CardGroup>
+
+## Source Reference
+
+**Component**: `src/components/DotNavigator.tsx` (40 lines)
+
+**Key Features**:
+- Fixed 6-screen navigation
+- Dynamic styling based on current screen
+- Dual color scheme (light/dark dots)
+- Hover scale effects
+- Container background transitions
+- Desktop-only rendering

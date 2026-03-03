@@ -1,0 +1,240 @@
+---
+title: 'Tailwind Configuration'
+description: 'Custom Tailwind CSS configuration including brand colors, typography, and responsive breakpoints'
+---
+
+## Overview
+
+The Sunflower Capital website uses a highly customized Tailwind CSS configuration that defines the brand's visual identity through custom colors, typography scales, and responsive breakpoints.
+
+## Configuration File
+
+The Tailwind configuration is located at `tailwind.config.ts` in the project root.
+
+## Brand Colors
+
+The color palette reflects Sunflower Capital's natural, earthy aesthetic:
+
+<CodeGroup>
+```typescript tailwind.config.ts
+colors: {
+  'offwhite': '#FFF9DE',
+  'offblack': '#010101',
+  'dark-brown': '#4F3A26',
+  'dark-green': '#03351A',
+  'white': '#FFFFFF',
+  'darkish-brown': '#704F38',
+  'light-grey': '#B9A89A',
+}
+```
+
+```jsx Usage Example
+<div className="bg-dark-green text-offwhite">
+  <h1 className="text-dark-brown">Sunflower Capital</h1>
+  <p className="text-light-grey">Investment management</p>
+</div>
+```
+</CodeGroup>
+
+<Note>
+The primary background color for the site is `dark-green` (#03351A), with `offwhite` (#FFF9DE) used for text and contrast.
+</Note>
+
+### Color Palette Reference
+
+| Color Name | Hex Code | Usage |
+|------------|----------|-------|
+| `offwhite` | #FFF9DE | Primary text, backgrounds |
+| `dark-green` | #03351A | Primary background, brand color |
+| `dark-brown` | #4F3A26 | Accents, headings |
+| `darkish-brown` | #704F38 | Secondary accents |
+| `light-grey` | #B9A89A | Subtle text, borders |
+| `offblack` | #010101 | Strong contrast text |
+
+## Typography
+
+### Font Families
+
+Three custom font families are configured:
+
+```typescript tailwind.config.ts
+fontFamily: {
+  'arya': ['Arya', 'system-ui'],
+  'bitter': ['Bitter', 'system-ui'],
+  'bitter-italic': ['Bitter-italic', 'system-ui']
+}
+```
+
+**Usage:**
+- `font-arya` - Arya font for headings and display text
+- `font-bitter` - Bitter font for body text
+- `font-bitter-italic` - Bitter italic variant
+
+### Font Sizes
+
+Custom font size scales for titles (t-prefix) and body text (b-prefix):
+
+<Accordion title="Title Sizes (t-prefix)">
+```typescript
+fontSize: {
+  txl: ['64px', '64px'],   // Extra large titles
+  tlg: ['56px', '56px'],   // Large titles
+  tmd: ['48px', '48px'],   // Medium titles
+  tsm: ['36px', '36px'],   // Small titles
+}
+```
+
+Use with `text-txl`, `text-tlg`, `text-tmd`, `text-tsm`.
+</Accordion>
+
+<Accordion title="Body Sizes (b-prefix)">
+```typescript
+fontSize: {
+  b2xl: ['84px', '126px'],   // 84px / 126px line-height
+  bxl: ['64px', '96px'],     // 64px / 96px line-height
+  bxlg: ['46px', '69px'],    // 46px / 69px line-height
+  blg: ['36px', '54px'],     // 36px / 54px line-height
+  bmd: ['32px', '48px'],     // 32px / 48px line-height
+  bsm: ['28px', '42px'],     // 28px / 42px line-height
+  bxsm: ['26px', '39px'],    // 26px / 39px line-height
+  bxs: ['24px', '36px'],     // 24px / 36px line-height
+  b2xs: ['20px', '30px'],    // 20px / 30px line-height
+  b3xs: ['18px', '27px'],    // 18px / 27px line-height
+  b34xs: ['16px', '24px'],   // 16px / 24px line-height
+  b4xs: ['14px', '21px'],    // 14px / 21px line-height
+  b5xs: ['12px', '18px'],    // 12px / 18px line-height
+}
+```
+
+Each size includes optimized line-height values (second parameter).
+</Accordion>
+
+### Line Heights
+
+```typescript
+lineHeight: {
+  'sm': '1',
+  'md': '1.5',
+  'lg': '2',
+  'xl': '2.5',
+}
+
+extend: {
+  lineHeight: {
+    'extra-loose': '2.5',
+  }
+}
+```
+
+## Responsive Breakpoints
+
+Custom screen breakpoints tailored to the site's design:
+
+```typescript tailwind.config.ts
+screens: {
+  'xs': '425px',
+  'sm': '640px',
+  'md': '768px',
+  'lg': '1024px',
+  'xl': '1440px',
+  '2xl': '1920px',
+}
+```
+
+<CodeGroup>
+```jsx Mobile First
+<div className="text-b4xs sm:text-b3xs md:text-b2xs lg:text-bxs">
+  Responsive text that grows with viewport
+</div>
+```
+
+```jsx Desktop First
+<div className="hidden lg:block">
+  Only visible on large screens and up
+</div>
+```
+</CodeGroup>
+
+<Note>
+The site includes extensive media queries for aspect ratios in `globals.css` to handle ultra-wide displays and portrait orientations.
+</Note>
+
+## Animations & Transitions
+
+### Custom Animations
+
+```typescript tailwind.config.ts
+extend: {
+  animation: {
+    'spin': 'spin 3s linear infinite',
+  },
+  transitionDuration: {
+    '2000': '2000ms',
+  },
+}
+```
+
+**Usage:**
+- `animate-spin` - 3-second continuous rotation
+- `duration-2000` - 2-second transition duration
+
+## Content Paths
+
+Tailwind scans these paths for class names:
+
+```typescript
+content: [
+  './src/**/*.{js,ts,jsx,tsx}',
+  './public/index.html',
+]
+```
+
+<Warning>
+Only classes used in these files will be included in the final CSS bundle. Dynamic class names must be written in full to be detected.
+</Warning>
+
+## Customization Guide
+
+### Adding a New Color
+
+```typescript tailwind.config.ts
+colors: {
+  // ... existing colors
+  'new-color': '#HEXCODE',
+}
+```
+
+Then use with `bg-new-color`, `text-new-color`, `border-new-color`, etc.
+
+### Adding a Font Size
+
+```typescript
+fontSize: {
+  // ... existing sizes
+  'custom': ['20px', '28px'], // [font-size, line-height]
+}
+```
+
+Use with `text-custom`.
+
+### Adding a Breakpoint
+
+```typescript
+screens: {
+  // ... existing breakpoints
+  '3xl': '2560px',
+}
+```
+
+Use with `3xl:text-b2xl`, `3xl:hidden`, etc.
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Custom Fonts" icon="font" href="/styling/custom-fonts">
+    Learn about Arya and Bitter font loading
+  </Card>
+  <Card title="Animations" icon="wand-magic-sparkles" href="/styling/animations">
+    CSS animations and interactive effects
+  </Card>
+</CardGroup>

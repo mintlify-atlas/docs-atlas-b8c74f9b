@@ -1,0 +1,278 @@
+---
+title: Testimonials
+description: A carousel component showcasing founder testimonials using Glide.js with keyboard navigation
+---
+
+## Overview
+
+The `Testimonials` component displays a carousel of testimonials from portfolio company founders. It uses the Glide.js library for smooth sliding animations and supports both mouse/touch navigation and keyboard arrow keys.
+
+## Props Interface
+
+<ParamField path="setScrollEnabled" type="(enabled: boolean) => void" required>
+  Callback to disable page-level scrolling during touch interactions with the carousel
+</ParamField>
+
+## Data Structure
+
+Each testimonial has the following structure:
+
+```typescript
+interface Quote {
+  quote: string;    // Testimonial text
+  author: string;   // Founder name
+  company: string;  // Company name
+  link: string;     // Company URL (optional in interface, present in data)
+}
+```
+
+## Features
+
+### Glide.js Integration
+
+The component initializes a Glide carousel with these settings:
+
+```typescript
+const glide = new Glide('.glide', {
+  type: 'carousel',      // Infinite loop
+  startAt: 0,            // First testimonial
+  perView: 1,            // One quote at a time
+  autoplay: false,       // Manual navigation only
+});
+```
+
+<Note>
+The carousel loops infinitely, allowing users to navigate continuously through all 23 testimonials.
+</Note>
+
+### Keyboard Navigation
+
+Arrow keys trigger visual feedback on the navigation buttons:
+
+```typescript
+useEffect(() => {
+  const handleArrow = (event: { key: String; }) => {
+    if (event.key === "ArrowLeft") {
+      const leftArrow = document.getElementById("left-arrow");
+      leftArrow.classList.add('scale-95', 'opacity-50');
+      setTimeout(() => {
+        leftArrow.classList.remove('scale-95', 'opacity-50');
+      }, 300);
+    }
+    // Similar for ArrowRight
+  };
+  window.addEventListener('keydown', handleArrow);
+}, []);
+```
+
+### Touch Scroll Prevention
+
+Prevents page scrolling during carousel swipe gestures:
+
+```typescript
+const handleTouchMove = (e: TouchEvent) => {
+  e.preventDefault();
+};
+testimonial.addEventListener('touchmove', handleTouchMove, { passive: false });
+```
+
+## Usage Example
+
+From `page.tsx:329-333`:
+
+```tsx
+import Testimonials from '@/components/Testimonials';
+
+function TestimonialsSection() {
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+
+  return (
+    <div className="bg-offwhite min-h-screen flex flex-col">
+      <Testimonials setScrollEnabled={setScrollEnabled} />
+    </div>
+  );
+}
+```
+
+## Testimonial Content
+
+The component includes **23 testimonials** from founders at:
+
+<CardGroup cols={2}>
+  <Card title="Early Stage" icon="seedling">
+    - Tabular (Ryan Blue)
+    - Clay (Kareem Amin)
+    - Temporal (Maxim Fateev)
+    - Railway (Jake Cooper)
+    - E2B (Vasek Mlejnsky)
+  </Card>
+  
+  <Card title="Growth Stage" icon="chart-line">
+    - Verkada (Raj Misra)
+    - Athelas/Commure (Tanay Tandon)
+    - Hadrian (Chris Power)
+    - PostHog (James Hawkins)
+    - Warp (Zach Lloyd)
+  </Card>
+  
+  <Card title="Acquired" icon="handshake">
+    - Tabular → Databricks (Ryan Blue)
+    - AlpacaML → Captions (Nicole Fitzgerald)
+  </Card>
+  
+  <Card title="International" icon="globe">
+    - Rerun (Moritz Schiebold - European roots)
+    - Houm (Benjamin Labra - Latin America)
+  </Card>
+</CardGroup>
+
+## Component Structure
+
+<CodeGroup>
+```tsx Navigation Controls
+<div className="glide__arrows flex gap-6" data-glide-el="controls">
+  <div className="glide__arrow--left" data-glide-dir="<">
+    <button id="left-arrow" className="arrow-container">
+      <Image src="/images/left.svg" alt="left arrow" />
+    </button>
+  </div>
+  <div className="glide__arrow--right" data-glide-dir=">">
+    <button id="right-arrow" className="arrow-container">
+      <Image src="/images/right.svg" alt="right arrow" />
+    </button>
+  </div>
+</div>
+```
+
+```tsx Carousel Track
+<div className="glide__track" 
+  data-glide-el="track"
+  onTouchStart={() => setScrollEnabled(false)}
+  onTouchEnd={() => setScrollEnabled(true)}
+>
+  <ul className="glide__slides">
+    {quotes.map((quote, index) => (
+      <li key={index} className="glide__slide">
+        <h3 className="font-bitter">
+          &ldquo;{quote.quote}&rdquo;
+        </h3>
+        <h3 className="font-semibold">{quote.author}</h3>
+        <a href={quote.link} target="_blank">
+          <h3 className="font-bitter-italic">{quote.company}</h3>
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+```
+</CodeGroup>
+
+## Interactions
+
+<Tabs>
+  <Tab title="Navigation Methods">
+    **Mouse/Touch**:
+    - Click left/right arrow buttons
+    - Swipe left/right on mobile
+    - Drag on desktop
+    
+    **Keyboard**:
+    - Press Left Arrow to go back
+    - Press Right Arrow to go forward
+    - Visual feedback on button press (scale + opacity)
+  </Tab>
+  
+  <Tab title="Animation States">
+    **Arrow Click**:
+    1. Button scales to 95% and opacity to 50%
+    2. 300ms transition duration
+    3. Returns to normal state
+    
+    **Slide Transition**:
+    - Glide.js handles smooth carousel animation
+    - `isSwiped` state tracks if user has interacted
+    - Opacity transitions: 1000ms duration
+  </Tab>
+  
+  <Tab title="Scroll Management">
+    **Touch Events**:
+    - `touchstart`: Disable page scroll
+    - `touchmove`: Prevent default (stop page scroll)
+    - `touchend`: Re-enable page scroll
+    
+    This prevents conflicts between carousel swipe and page scroll.
+  </Tab>
+</Tabs>
+
+## Responsive Design
+
+**Text Sizing** (responsive breakpoints):
+- `md:text-b2xs` (small tablets)
+- `lg:text-bxs` (tablets)
+- `xl:text-bsm` (laptops)
+- `2xl:text-bmd` (large desktops)
+
+**Layout**:
+- Width: 80% of container (`w-4/5`)
+- Heading: "Founders" in `font-arya`
+- Quote text: `font-bitter` with generous line height
+- Author: `font-semibold`
+- Company: `font-bitter-italic` with hover underline
+
+**Arrow Buttons**:
+- Size: `w-10 h-10` on mobile, `2xl:w-12 2xl:h-12` on large screens
+- Gap: `gap-3` on mobile, `lg:gap-6` on large screens
+
+## Example Testimonials
+
+<Accordion title="Sample: Tabular (acquired by Databricks)">
+> "Quality is really what really sets Liu apart from other investors. Working with Liu was unique because she was extremely proactive. She was my first call, and she was always trying to find ways to help, not just relying on me to think about what I needed."
+
+**Ryan Blue**, Tabular (acquired by Databricks)
+</Accordion>
+
+<Accordion title="Sample: Clay">
+> "Liu is the best kind of investor: she is technical, understands product deeply, and can quickly understand the big picture. She's really well connected with top talent and investors. She'll help when she's needed and give you space to operate otherwise."
+
+**Kareem Amin**, Clay
+</Accordion>
+
+<Accordion title="Sample: Warp">
+> "Liu has been an invaluable investor for Warp, going way beyond just investing money. She invested a bunch of her time helping us with GTM, Growth, and Product. She is more willing and able than most investors to roll up her sleeves and help the leadership team operate."
+
+**Zach Lloyd**, Warp
+</Accordion>
+
+## Styling Details
+
+- **Container**: Full width flex column with centered content
+- **Background**: `bg-offwhite`
+- **Text color**: `text-dark-green`
+- **Heading size**: `text-tmd` to `text-txl` (responsive)
+- **Quote text**: Line height scales with breakpoints (`md:leading-lg`, etc.)
+- **Hover states**: Company links underline with `decoration-[1px]`
+
+## Dependencies
+
+```json
+{
+  "@glidejs/glide": "^3.x",
+  "next/image": "Next.js Image component"
+}
+```
+
+**Required CSS**:
+```typescript
+import '@glidejs/glide/dist/css/glide.core.min.css';
+import '@glidejs/glide/dist/css/glide.theme.min.css';
+```
+
+## Source Reference
+
+**Component**: `src/components/Testimonials.tsx` (317 lines)
+
+**Key Features**:
+- Glide.js carousel with infinite loop
+- Keyboard navigation with visual feedback
+- Touch event handling for mobile
+- 23 founder testimonials with company links

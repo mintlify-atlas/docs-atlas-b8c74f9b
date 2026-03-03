@@ -1,80 +1,380 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get the Sunflower Capital website running locally in under 5 minutes
 ---
 
-## Get started in three steps
+## Clone the repository
 
-Get your documentation site running locally and make your first customization.
+Start by cloning the Sunflower Capital repository to your local machine:
 
-### Step 1: Set up your local environment
+```bash
+git clone <repository-url>
+cd sunflower-nextjs
+```
+
+<Note>
+  Replace `<repository-url>` with your actual Git repository URL. If you don't have access to the repository yet, contact your team administrator.
+</Note>
+
+## Install dependencies
+
+The project uses npm for package management. Install all required dependencies:
+
+<CodeGroup>
+```bash npm
+npm install
+```
+
+```bash yarn
+yarn install
+```
+
+```bash pnpm
+pnpm install
+```
+
+```bash bun
+bun install
+```
+</CodeGroup>
+
+This will install all dependencies defined in `package.json`:
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion title="Core dependencies">
+    - **next** (^14.2.14) - React framework with App Router
+    - **react** (^18) - UI library
+    - **react-dom** (^18) - React DOM renderer
+    - **react-page-scroller** (^3.0.1) - Full-page scrolling functionality
+    - **@glidejs/glide** (^3.6.2) - Testimonials carousel
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+  <Accordion title="Device & analytics">
+    - **react-device-detect** (^2.2.3) - Mobile/desktop detection
+    - **ua-parser-js** (^1.0.39) - User agent parsing
+    - **@vercel/analytics** (^1.5.0) - Vercel Analytics integration
+    - **@next/third-parties** (^15.3.1) - Third-party script optimization
+  </Accordion>
+  <Accordion title="Development tools">
+    - **typescript** (^5) - Type safety
+    - **tailwindcss** (^3.4.10) - Utility-first CSS
+    - **autoprefixer** (^10.4.20) - CSS vendor prefixes
+    - **eslint** (^8) - Code linting
+    - **eslint-config-next** (14.2.7) - Next.js ESLint config
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## Start the development server
+
+Once dependencies are installed, start the local development server:
+
+<CodeGroup>
+```bash npm
+npm run dev
+```
+
+```bash yarn
+yarn dev
+```
+
+```bash pnpm
+pnpm dev
+```
+
+```bash bun
+bun dev
+```
+</CodeGroup>
+
+The development server will start on `http://localhost:3000`.
+
+<Steps>
+  <Step title="Server starts">
+    You'll see output indicating Next.js has compiled successfully:
+    
+    ```bash
+    ▲ Next.js 14.2.14
+    - Local:        http://localhost:3000
+    - Ready in 2.3s
+    ```
+  </Step>
+  <Step title="Open browser">
+    Navigate to [http://localhost:3000](http://localhost:3000) in your browser
+  </Step>
+  <Step title="View the site">
+    You should see the Sunflower Capital hero section with animated flowers
+  </Step>
+</Steps>
+
+<Check>
+  **Success!** The page auto-updates as you edit files thanks to Fast Refresh.
+</Check>
+
+## Project structure
+
+Understand the key directories and files:
+
+```bash
+sunflower-nextjs/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx          # Main application component
+│   │   ├── layout.tsx        # Root layout with metadata
+│   │   ├── globals.css       # Global styles and animations
+│   │   └── favicon.ico       # Site favicon
+│   └── components/
+│       ├── PortfolioTable.tsx    # Portfolio filtering table
+│       ├── Testimonials.tsx      # Testimonials carousel
+│       ├── Footer.tsx            # Footer component
+│       ├── Ethos.tsx             # Investment philosophy
+│       ├── DotNavigator.tsx      # Section navigation dots
+│       └── DropDown.tsx          # Dropdown component
+├── public/
+│   ├── fonts/
+│   │   ├── Arya/             # Arya font family
+│   │   ├── Bitter/           # Bitter font family
+│   │   └── app.css           # Font imports
+│   └── images/
+│       ├── flower-*.svg      # Animated flower SVGs
+│       ├── sunflower-logo.svg
+│       └── og-image.png      # Social sharing image
+├── tailwind.config.ts        # Tailwind configuration
+├── tsconfig.json             # TypeScript configuration
+├── next.config.mjs           # Next.js configuration
+└── package.json              # Dependencies and scripts
+```
+
+## Verify installation
+
+Test that everything is working correctly:
+
+### 1. Check the hero section
+
+The hero section should display:
+- "SUNFLOWER CAPITAL" title in Arya font
+- Multiple animated sunflower SVGs
+- Dark green (#03351A) background
+- Breathing animation on the center flower
+
+### 2. Test scrolling
+
+Scroll down (or use mouse wheel) to navigate through sections:
+1. Hero with animated flowers
+2. Mission statement on off-white background
+3. Ethos section with investment philosophy
+4. Portfolio table with filtering
+5. Testimonials carousel
+6. Footer with contact information
+
+### 3. Test portfolio filtering
+
+On desktop/landscape mode:
+- Click filter buttons like "AI/ML", "Fintech", "Developer"
+- Verify the portfolio table updates to show only matching companies
+- Click "All" to show all 56+ companies
+
+On mobile/portrait mode:
+- Use the dropdown selector to filter by industry
+
+### 4. Verify responsive behavior
+
+<Tabs>
+  <Tab title="Desktop (>1024px)">
+    - Full flower layout visible
+    - Dot navigation on right side
+    - Filter buttons displayed horizontally
+    - Three-column portfolio table
+  </Tab>
+  <Tab title="Tablet (768px-1024px)">
+    - Adjusted flower positions
+    - Simplified ethos layout
+    - Two-column portfolio view
+  </Tab>
+  <Tab title="Mobile (<768px)">
+    - Single center flower only
+    - Dropdown filter instead of buttons
+    - Stacked portfolio layout
+    - Hidden dot navigation
+  </Tab>
+</Tabs>
+
+## Edit your first page
+
+Let's make a simple change to verify hot reload works:
+
+<Steps>
+  <Step title="Open the main page">
+    Open `src/app/page.tsx` in your code editor
+  </Step>
+  <Step title="Find the title">
+    Locate the hero title around line 104-108:
+    
+    ```tsx src/app/page.tsx
+    <h1 className="title font-arya font-bold text-offwhite...">
+      SUNFLOWER <br /> CAPITAL
+    </h1>
+    ```
+  </Step>
+  <Step title="Make a change">
+    Try modifying the text (just for testing):
+    
+    ```tsx
+    <h1 className="title font-arya font-bold text-offwhite...">
+      SUNFLOWER <br /> CAPITAL <br /> VENTURES
+    </h1>
+    ```
+  </Step>
+  <Step title="View the change">
+    Save the file and watch your browser automatically update without refresh
+  </Step>
+  <Step title="Revert the change">
+    Undo your changes to restore the original title
+  </Step>
+</Steps>
+
+## Build for production
+
+When you're ready to create a production build:
+
+```bash
+npm run build
+```
+
+This command:
+1. Compiles TypeScript to JavaScript
+2. Optimizes React components
+3. Processes and minifies CSS with Tailwind
+4. Optimizes images and fonts
+5. Generates static pages where possible
+6. Creates optimized bundles
+
+The output will be placed in `.next/` directory.
+
+### Start production server
+
+After building, run the production server locally:
+
+```bash
+npm run start
+```
+
+This serves the optimized production build on `http://localhost:3000`.
+
+<Warning>
+  The production build is optimized for performance but takes longer to compile. Use `npm run dev` for development.
+</Warning>
+
+## Run linting
+
+Ensure your code follows Next.js best practices:
+
+```bash
+npm run lint
+```
+
+This runs ESLint with Next.js configuration to catch:
+- React Hooks violations
+- Accessibility issues
+- Next.js-specific anti-patterns
+- TypeScript type errors
+
+## Common issues
 
 <AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+  <Accordion title="Port 3000 already in use">
+    If port 3000 is occupied, Next.js will automatically try 3001, 3002, etc. Or specify a custom port:
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
+    ```bash
+    PORT=3001 npm run dev
+    ```
+  </Accordion>
+  <Accordion title="Module not found errors">
+    Delete `node_modules` and reinstall:
+    
+    ```bash
+    rm -rf node_modules package-lock.json
+    npm install
+    ```
+  </Accordion>
+  <Accordion title="TypeScript errors">
+    Ensure you're using Node.js 18+ and TypeScript 5:
+    
+    ```bash
+    node --version  # Should be v18.0.0 or higher
+    npx tsc --version  # Should be Version 5.x
+    ```
+  </Accordion>
+  <Accordion title="Fonts not loading">
+    Custom fonts are in `public/fonts/`. Verify the files exist:
+    
+    ```bash
+    ls public/fonts/Arya/
+    ls public/fonts/Bitter/
+    ```
+    
+    Font faces are defined in `src/app/globals.css` at lines 20-37.
+  </Accordion>
+  <Accordion title="Animations not working">
+    Clear your browser cache and hard reload:
+    - **Chrome/Edge**: Ctrl+Shift+R (Cmd+Shift+R on Mac)
+    - **Firefox**: Ctrl+F5 (Cmd+Shift+R on Mac)
+    - **Safari**: Cmd+Option+R
   </Accordion>
 </AccordionGroup>
 
-### Step 3: Go live
+## Environment variables
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+The project includes Google Analytics. To configure:
+
+<Steps>
+  <Step title="Create .env.local">
+    Create a `.env.local` file in the root directory (already gitignored)
+  </Step>
+  <Step title="Add analytics ID">
+    The Google Analytics ID is currently hardcoded in `src/app/layout.tsx:98`:
+    
+    ```tsx
+    <GoogleAnalytics gaId="G-SR59L3T5LT" />
+    ```
+    
+    For local development, you may want to disable this or use a different ID.
+  </Step>
+</Steps>
+
+<Note>
+  Vercel Analytics works automatically when deployed to Vercel - no configuration needed.
+</Note>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
+Now that you have the development environment running:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card
+    title="Customize styling"
+    icon="paintbrush"
+    href="/styling/tailwind-configuration"
+  >
+    Learn how to customize colors, fonts, and animations
+  </Card>
+  <Card
+    title="Deploy to Vercel"
+    icon="rocket"
+    href="/deployment/vercel"
+  >
+    Deploy your site to production with automatic CI/CD
+  </Card>
+  <Card
+    title="Portfolio component"
+    icon="briefcase"
+    href="/components/portfolio-table"
+  >
+    Explore the portfolio table component and filtering
+  </Card>
+  <Card
+    title="Architecture overview"
+    icon="sitemap"
+    href="/architecture/overview"
+  >
+    Understand the application architecture and design
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

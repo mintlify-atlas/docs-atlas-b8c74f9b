@@ -1,0 +1,433 @@
+---
+title: 'Animations'
+description: 'CSS animations, transitions, and interactive effects including breathe, grow, and responsive flower positioning'
+---
+
+## Overview
+
+The Sunflower Capital website uses a combination of CSS animations, hover effects, and responsive positioning to create an organic, interactive experience. Key features include:
+
+- **Breathe animation** - Gentle pulsing effect
+- **Grow hover effect** - Scale transformation on hover
+- **Responsive flower positioning** - Complex media queries for decorative elements
+- **Custom transitions** - Smooth state changes
+
+## Core Animations
+
+### Breathe Animation
+
+A gentle pulsing effect that scales elements in and out:
+
+```css globals.css
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.breathe {
+  animation: breathe 3s ease-in-out infinite; 
+}
+```
+
+**Usage:**
+```jsx
+<div className="breathe">
+  <img src="/flower.png" alt="Breathing flower" />
+</div>
+```
+
+<Note>
+The breathe animation uses a 3-second duration with `ease-in-out` timing for smooth, natural motion.
+</Note>
+
+### Grow Hover Effect
+
+Scales elements to 120% on hover:
+
+```css globals.css
+.grow:hover {
+  transform: scale(1.2);
+}
+```
+
+**Usage:**
+```jsx
+<button className="grow transition-transform duration-300">
+  Hover me
+</button>
+```
+
+<Tip>
+Combine with Tailwind's `transition-transform` utility for smooth scaling.
+</Tip>
+
+## Tailwind Animation Extensions
+
+Custom animations defined in `tailwind.config.ts`:
+
+```typescript tailwind.config.ts
+extend: {
+  animation: {
+    'spin': 'spin 3s linear infinite',
+  },
+  transitionDuration: {
+    '2000': '2000ms',
+  },
+}
+```
+
+### Spin Animation
+
+```jsx
+<div className="animate-spin">
+  <LoadingIcon />
+</div>
+```
+
+<Accordion title="Standard Tailwind vs. Custom Spin">
+Tailwind's default `animate-spin` is 1s. The custom configuration extends this to 3s for a slower, more subtle rotation.
+</Accordion>
+
+### Extended Transition Durations
+
+```jsx
+<div className="transition-opacity duration-2000 hover:opacity-50">
+  Fades over 2 seconds
+</div>
+```
+
+## Responsive Flower Positioning
+
+The website includes complex responsive positioning for decorative flower elements that adapt to different aspect ratios and orientations.
+
+### Base Flower Styles
+
+```css globals.css
+.flower, .centerflower {
+  position: absolute;
+  transition: transform 500ms ease-in-out, opacity 2000ms ease-in-out;
+  background-size: contain;            
+  background-repeat: no-repeat;                              
+}
+```
+
+### Portrait Orientation
+
+On portrait devices, most flowers are hidden except for a central one:
+
+```css globals.css
+@media (orientation: portrait) {   
+  .title { 
+    font-size: 18vw; 
+    line-height: 16vw; 
+  }
+  
+  .flower {
+    display: none;                           
+  }
+  
+  .flower-4 { 
+    width: 55vw; 
+    height: 55vw; 
+    display: block; 
+    position: relative; 
+    transition: transform 500ms ease-in-out, opacity 2000ms ease-in-out; 
+  }
+}
+```
+
+### Landscape Aspect Ratios
+
+<Accordion title="Standard Landscape (max-aspect-ratio: 2.05)">
+```css
+@media (orientation: landscape) {    
+  @media (max-aspect-ratio: 2.05) {    
+    .title { 
+      font-size: 18.4vw; 
+      line-height: 13vw; 
+      padding-top: 1.5rem; 
+    }
+    
+    .flower-2 { width: 7vw; height: 7vw; top: 57vh; left: 5vw; }
+    .flower-3 { width: 8vw; height: 8vw; top: 56vh; left: 30vw; }
+    .flower-4 { width: 20vw; height: 20vw; top: 55vh; left: 40vw; }
+    .flower-5 { width: 15vw; height: 15vw; top: 36vh; left: 66.5vw; }
+    .flower-7 { width: 12vw; height: 12vw; top: 33vh; left: 83vw; }
+    /* ... more flowers */
+  }
+}
+```
+
+Covers most desktop and laptop screens.
+</Accordion>
+
+<Accordion title="Wide Screens (2.05 - 2.5 aspect ratio)">
+```css
+@media (min-aspect-ratio: 2.05) {    
+  @media (max-aspect-ratio:2.5) {
+    .title { 
+      font-size: 18.4vw; 
+      line-height: 13vw; 
+      padding-top: 0;
+    }
+    
+    .flower-2 { width: 7vw; height: 7vw; top: 80vh; left: 5vw; }
+    .flower-3 { width: 8vw; height: 8vw; top: 68vh; left: 17vw; }
+    .flower-4 { width: 15vw; height: 15vw; top: 62vh; left: 42.5vw; }
+    /* Adjusted positions for wider screens */
+  }
+}
+```
+
+Ultra-wide monitors and some modern laptops.
+</Accordion>
+
+<Accordion title="Ultra-Wide (2.5 - 3.0 aspect ratio)">
+```css
+@media (min-aspect-ratio:2.5) {
+  @media (max-aspect-ratio: 3) {
+    .title { 
+      font-size: 12vw; 
+      line-height: 9vw; 
+      padding-top: 0;
+    }
+    
+    .logoflower {
+      display: none; /* Hide logo flower on ultra-wide */
+    }
+    
+    /* Repositioned flowers */
+    .flower-2 { width: 7vw; height: 7vw; top: 70vh; left: 5vw; }
+    .flower-3 { width: 8vw; height: 8vw; top: 55vh; left: 17vw; }
+  }
+}
+```
+
+Handles ultra-wide displays with adjusted positioning.
+</Accordion>
+
+<Accordion title="Extreme Ultra-Wide (3.0+ aspect ratio)">
+```css
+@media (min-aspect-ratio: 3) {
+  .title { 
+    font-size: 12vw; 
+    line-height: 9vw; 
+    width: 66%;
+    height: 100%;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    text-align: left;
+  }
+
+  .flowerbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .flower, .centerflower {
+    position: relative; /* Changed from absolute */
+    transition: transform 500ms ease-in-out, opacity 2000ms ease-in-out;
+    background-size: contain;            
+    background-repeat: no-repeat;                              
+  }
+
+  .logoflower {
+    display: none;
+  }
+
+  .flower-4 { width: 66vh; height: 66vh; }
+}
+```
+
+For extreme ultra-wide setups, flowers use relative positioning within a flex container.
+</Accordion>
+
+## Custom Utilities
+
+### Title Positioning
+
+```css globals.css
+.title {
+  position: relative;
+  line-height: 67%;
+}
+```
+
+### Scrollbar Customization
+
+<CodeGroup>
+```css Hide Scrollbar (Mobile)
+.mobile::-webkit-scrollbar {
+  display: none;
+}
+
+.noscroll::-webkit-scrollbar {
+  display: none;
+}
+```
+
+```css Custom Scrollbar
+.custom-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 12px;
+  height: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-bottom: 25px;
+}
+```
+</CodeGroup>
+
+### Custom Border
+
+```css globals.css
+.custom-border-row::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 20px; 
+  bottom: 0;
+  height: 1px;
+  background-color: #006400; 
+  opacity: 0.2;
+}
+```
+
+Creates a subtle bottom border using a pseudo-element.
+
+## Navigation Dots
+
+Animated navigation dots with hover effects:
+
+```css globals.css
+.dot-container {
+  right: 20px;
+  position: fixed; 
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px; 
+  z-index: 1000;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+```
+
+**Usage:**
+```jsx
+<div className="dot-container">
+  <div className="dot bg-offwhite opacity-50 hover:opacity-100" />
+  <div className="dot bg-offwhite opacity-50 hover:opacity-100" />
+  <div className="dot bg-offwhite opacity-100" /> {/* Active */}
+</div>
+```
+
+## Animation Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Performance" icon="gauge-high">
+    Use `transform` and `opacity` for animations (GPU-accelerated). Avoid animating `width`, `height`, `top`, `left`.
+  </Card>
+  
+  <Card title="Accessibility" icon="universal-access">
+    Respect `prefers-reduced-motion`:
+    
+    ```css
+    @media (prefers-reduced-motion: reduce) {
+      .breathe {
+        animation: none;
+      }
+    }
+    ```
+  </Card>
+  
+  <Card title="Timing Functions" icon="clock">
+    - `ease-in-out` for most animations
+    - `linear` for continuous rotations
+    - `ease-out` for entrances
+    - `ease-in` for exits
+  </Card>
+  
+  <Card title="Duration" icon="stopwatch">
+    - Micro-interactions: 150-300ms
+    - Standard: 300-500ms
+    - Emphasis: 500ms-2s
+    - Ambient: 2s+
+  </Card>
+</CardGroup>
+
+## Common Patterns
+
+### Fade In on Load
+
+```jsx
+<div className="opacity-0 animate-fade-in">
+  Content that fades in
+</div>
+```
+
+```css
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+```
+
+### Slide Up Entrance
+
+```jsx
+<div className="translate-y-10 opacity-0 transition-all duration-500 hover:translate-y-0 hover:opacity-100">
+  Slides up on hover
+</div>
+```
+
+### Staggered List Animation
+
+```jsx
+{items.map((item, index) => (
+  <div 
+    key={item.id}
+    className="opacity-0 animate-fade-in"
+    style={{ animationDelay: `${index * 100}ms` }}
+  >
+    {item.content}
+  </div>
+))}
+```
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Tailwind Configuration" icon="palette" href="/styling/tailwind-configuration">
+    Theme colors, breakpoints, and utilities
+  </Card>
+  <Card title="Custom Fonts" icon="font" href="/styling/custom-fonts">
+    Arya and Bitter font loading
+  </Card>
+</CardGroup>

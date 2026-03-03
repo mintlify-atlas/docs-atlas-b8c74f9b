@@ -1,0 +1,279 @@
+---
+title: Ethos
+description: An accordion component displaying investment philosophy and principles
+---
+
+## Overview
+
+The `Ethos` component displays Sunflower Capital's investment philosophy through an interactive accordion interface. Each principle can be expanded to reveal supporting details.
+
+## Props Interface
+
+```typescript
+interface EthosProps {}
+```
+
+<Info>
+This component has no required props - it manages its own internal state.
+</Info>
+
+## Features
+
+### Accordion State Management
+
+The component uses local state to track which accordion item is expanded:
+
+```typescript
+const [active, setActive] = useState(0);
+
+// Toggle logic: clicking active item closes it, clicking inactive opens it
+<button onClick={() => setActive(active === 1 ? 0 : 1)}>
+  <DropDown isExpanded={active === 1} />
+</button>
+```
+
+<Note>
+Only one accordion item can be expanded at a time. The `active` state stores the index (1-4) of the open item, or 0 if all are closed.
+</Note>
+
+### Investment Principles
+
+The component displays four core principles:
+
+<Steps>
+  <Step title="First Check & Urgency">
+    **Question**: "We often write the first check to visionaries who act with urgency."
+    
+    **Details**:
+    - Back founders with original insights, technical acumen, and insatiable ambition
+    - Build deep-rooted, long-term relationships with product artisans who build with intention
+  </Step>
+  
+  <Step title="Category-Defining Leaders">
+    **Question**: "We partner with emerging category-defining leaders that endure."
+    
+    **Details**:
+    - Invest in N-of-1 companies that marry defensible technology with novel go-to-market
+    - Create new markets or reimagine legacy industries through robust software, delightful UX, and superior incentives
+  </Step>
+  
+  <Step title="Hard-Earned Experience">
+    **Question**: "We operate with the lens of over a decade of hard-earned experience."
+    
+    **Details**:
+    - Bring context, case studies, and inside stories that don't exist online
+    - Don't chase consensus - develop independent theses, move with conviction, and nail market timing
+  </Step>
+  
+  <Step title="Founders' Terms">
+    **Question**: "We work on founders' terms, not ours."
+    
+    **Details**:
+    - Every founding team is unique - proactively sow the seeds for companies to blossom
+    - Help founders find product-market fit, hire world-class talent, and grow to first few million in quality recurring revenue
+  </Step>
+</Steps>
+
+## Usage Example
+
+From `page.tsx:278-316`:
+
+```tsx
+import Ethos from '@/components/Ethos';
+
+function EthosSection() {
+  const [lg, setLg] = useState(false);
+  
+  useEffect(() => {
+    setLg(window.innerWidth >= 1024);
+  }, []);
+
+  return (
+    <div className="h-screen w-full bg-offwhite flex flex-col items-center justify-center">
+      {/* Desktop: Show accordion */}
+      {lg && <Ethos />}
+      
+      {/* Mobile: Show static text */}
+      {!lg && (
+        <div className="w-[85%] flex flex-col gap-6">
+          <h1 className="font-arya text-dark-green text-tmd">Ethos</h1>
+          <div className="flex flex-col gap-6">
+            <h3>
+              <span className="font-semibold">We often write the first check...</span>
+              <br />
+              We back founders with original insights...
+            </h3>
+            {/* Other principles as static text */}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+<Warning>
+On screens smaller than 1024px (the `lg` breakpoint), the site renders static text instead of the accordion component to ensure better mobile readability.
+</Warning>
+
+## Component Structure
+
+<CodeGroup>
+```tsx Ethos Container
+<div className="h-screen w-full bg-offwhite flex flex-col items-center justify-center xl:gap-10 2xl:gap-12">
+  <h1 className="font-arya text-dark-green w-[85%] text-left text-tmd xl:text-tlg 2xl:text-txl">
+    Ethos
+  </h1>
+  
+  <div className="flex flex-col font-bitter text-dark-green w-[85%] lg:h-[26.25rem] xl:h-[37.25rem] 2xl:h-[42.75rem] justify-around">
+    {/* Accordion buttons */}
+  </div>
+</div>
+```
+
+```tsx Accordion Button
+<button onClick={() => setActive(active === 1 ? 0 : 1)}>
+  <DropDown 
+    question="We often write the first check to visionaries who act with urgency."
+    answer1="We back founders with original insights, technical acumen, and insatiable ambition."
+    answer2="Well before their founder journeys begin, we build deep-rooted, long-term relationships with product artisans who build with intention."
+    isExpanded={active === 1}
+  />
+</button>
+```
+</CodeGroup>
+
+## DropDown Component Integration
+
+Each principle uses the reusable `DropDown` component with these props:
+
+<ParamField path="question" type="string" required>
+  The main principle heading (always visible)
+</ParamField>
+
+<ParamField path="answer1" type="string" required>
+  First supporting detail (revealed when expanded)
+</ParamField>
+
+<ParamField path="answer2" type="string" required>
+  Second supporting detail (revealed when expanded)
+</ParamField>
+
+<ParamField path="isExpanded" type="boolean" required>
+  Controls whether this accordion item is currently expanded
+</ParamField>
+
+## Responsive Design
+
+**Container Heights** (fixed per breakpoint):
+- `lg`: 26.25rem (420px)
+- `xl`: 37.25rem (596px)
+- `2xl`: 42.75rem (684px)
+
+**Heading Sizes**:
+- Base: `text-tmd`
+- `xl`: `text-tlg`
+- `2xl`: `text-txl`
+
+**Body Text Sizes**:
+- `text-b4xs` (mobile)
+- `xs:text-b3xs`
+- `lg:text-bxs`
+- `xl:text-bmd`
+- `2xl:text-bsm`
+
+**Gaps**:
+- Container gap: `xl:gap-10 2xl:gap-12`
+- Between principles: `justify-around` (equal spacing)
+
+## Interaction Behavior
+
+<Tabs>
+  <Tab title="Click Behavior">
+    **Clicking a closed item**:
+    - Opens that item (sets `active` to 1-4)
+    - Closes any previously open item
+    - Animates expansion with scale-y transform
+    
+    **Clicking an open item**:
+    - Closes that item (sets `active` to 0)
+    - Animates collapse
+  </Tab>
+  
+  <Tab title="Visual Feedback">
+    **Expanded state**:
+    - Background opacity increases to 20%
+    - Shows "X" icon
+    - Reveals two answer paragraphs
+    - Scale-y animation: 0 to 100%
+    
+    **Collapsed state**:
+    - Background opacity at 10%
+    - Shows "+" icon
+    - Hides answer content
+    - Scale-y: 100% to 0
+  </Tab>
+  
+  <Tab title="Accessibility">
+    - All accordion items are `<button>` elements
+    - Clickable area covers full width
+    - Visual indicator (icon) shows expand/collapse state
+    - Text remains readable with sufficient contrast
+  </Tab>
+</Tabs>
+
+## Styling Details
+
+**Typography**:
+- Heading: `font-arya` (display font)
+- Body: `font-bitter` (serif)
+- Questions: `font-semibold`
+- Answers: Regular weight
+
+**Colors**:
+- Background: `bg-offwhite`
+- Text: `text-dark-green`
+- Accordion items: `bg-dark-green` with opacity variants
+
+**Layout**:
+- Width: 85% of viewport
+- Height: Full viewport height (`h-screen` or `h-[calc(100dvh)]`)
+- Vertical centering: `justify-center items-center`
+
+## Mobile Alternative
+
+On screens below `lg` (1024px), the page renders static content instead:
+
+```tsx
+<div className="w-[85%] flex flex-col gap-6">
+  <h1 className="font-arya text-dark-green text-tmd">Ethos</h1>
+  <div className="flex flex-col gap-6 text-b5xs lg:text-bxs">
+    <h3>
+      <span className="font-semibold xs:text-b4xs">
+        We often write the first check to visionaries who act with urgency.
+      </span>
+      <br />
+      We back founders with original insights, technical acumen...
+    </h3>
+    {/* Remaining principles */}
+  </div>
+</div>
+```
+
+<Info>
+The mobile version displays all four principles as expanded text blocks for easier reading on smaller screens.
+</Info>
+
+## Source Reference
+
+**Component**: `src/components/Ethos.tsx` (64 lines)
+
+**Dependencies**:
+- React (useState)
+- DropDown component (`./DropDown`)
+
+**Key Features**:
+- Single-item expansion accordion
+- Four investment principles
+- Responsive rendering (accordion vs static)
+- Clean, minimal interface

@@ -1,0 +1,588 @@
+---
+title: 'Responsive Design Patterns'
+description: 'Mobile and desktop responsive strategies including portrait/landscape handling and breakpoint architecture'
+icon: 'mobile-screen'
+---
+
+## Overview
+
+The Sunflower Capital website implements a sophisticated responsive design system that adapts to device type, screen size, and orientation. The architecture uses a combination of Tailwind utilities, custom CSS media queries, and runtime device detection.
+
+## Device Detection Strategy
+
+### Runtime Detection
+
+The application uses `react-device-detect` for reliable device type detection:
+
+```tsx src/app/page.tsx
+import { isMobile } from 'react-device-detect';
+
+const App: React.FC = () => {
+  const [mobile, setMobile] = useState(true);
+  const [lg, setLg] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setLg(window.innerWidth >= 1024);
+    };
+    
+    setMobile(isMobile);
+    setLg(window.innerWidth >= 1024);
+    
+    if (isMobile) {
+      setLoaded(true);
+    } else {
+      setTimeout(() => {
+        setLoaded(true);
+      }, 500);
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+};
+```
+
+<Info>
+  The `isMobile` check detects actual mobile devices (phones/tablets) via user agent parsing, while `lg` tracks viewport breakpoint for responsive layouts.
+</Info>
+
+### State-Driven Responsive Logic
+
+<Tabs>
+  <Tab title="Mobile State">
+    ```tsx
+    const [mobile, setMobile] = useState(true);
+    ```
+    Determined once on mount using `react-device-detect`. Used for:
+    - Component variant selection
+    - Touch vs mouse event handling
+    - Navigation style (dots vs swipe)
+  </Tab>
+  <Tab title="Breakpoint State">
+    ```tsx
+    const [lg, setLg] = useState(false);
+    ```
+    Tracks `window.innerWidth >= 1024`. Updates on resize. Used for:
+    - Desktop vs mobile component rendering
+    - Layout switching (Ethos component)
+  </Tab>
+</Tabs>
+
+## Breakpoint System
+
+Custom Tailwind breakpoints align with common device sizes:
+
+```ts tailwind.config.ts
+screens: {
+  'xs': '425px',   // Large phones
+  'sm': '640px',   // Small tablets
+  'md': '768px',   // Tablets
+  'lg': '1024px',  // Small laptops
+  'xl': '1440px',  // Desktop
+  '2xl': '1920px', // Large desktop
+}
+```
+
+<CardGroup cols={3}>
+  <Card title="xs (425px)" icon="mobile">
+    Large phones (iPhone 12 Pro Max, Pixel 6)
+  </Card>
+  <Card title="md (768px)" icon="tablet">
+    Tablets (iPad, Galaxy Tab)
+  </Card>
+  <Card title="lg (1024px)" icon="laptop">
+    Laptops and small desktops
+  </Card>
+  <Card title="xl (1440px)" icon="desktop">
+    Standard desktop monitors
+  </Card>
+  <Card title="2xl (1920px)" icon="tv">
+    Large displays and 1080p screens
+  </Card>
+</CardGroup>
+
+## Orientation-Based Layouts
+
+The design heavily utilizes portrait/landscape media queries:
+
+### Portrait Mode
+
+```tsx src/app/page.tsx
+<div className="flex portrait:flex-col justify-center portrait:items-center portrait:gap-20">
+  <h1 className="portrait:text-center">SUNFLOWER <br /> CAPITAL</h1>
+  <div className="flowerbox">
+    {/* Only center flower visible in portrait */}
+  </div>
+</div>
+```
+
+```css globals.css
+@media (orientation: portrait) {   
+  .title { 
+    font-size: 18vw; 
+    line-height: 16vw; 
+  }
+  .flower {
+    display: none; /* Hide all decorative flowers */                        
+  }
+  .flower-4 { 
+    width: 55vw; 
+    height: 55vw; 
+    display: block; 
+    position: relative;
+  }
+}
+```
+
+<Note>
+  In portrait mode, only the center flower (flower-4) is displayed to conserve vertical space and maintain visual focus.
+</Note>
+
+### Landscape Mode with Aspect Ratio Ranges
+
+Landscape layouts adapt based on aspect ratio:
+
+<Tabs>
+  <Tab title="Standard (< 2.05)">
+    ```css globals.css
+    @media (orientation: landscape) {    
+      @media (max-aspect-ratio: 2.05) {    
+        .title { 
+          font-size: 18.4vw; 
+          line-height: 13vw; 
+          padding-top: 1.5rem; 
+        }
+        .flower-2 { width: 7vw; height: 7vw; top: 57vh; left: 5vw; }
+        .flower-3 { width: 8vw; height: 8vw; top: 56vh; left: 30vw; }
+        .flower-4 { width: 20vw; height: 20vw; top: 55vh; left: 40vw; }
+        .flower-5 { width: 15vw; height: 15vw; top: 36vh; left: 66.5vw; }
+        /* ... more flowers */
+      }
+    }
+    ```
+    Typical laptops and desktop monitors
+  </Tab>
+  <Tab title="Wide (2.05 - 2.5)">
+    ```css globals.css
+    @media (min-aspect-ratio: 2.05) {
+      @media (max-aspect-ratio:2.5) {
+        .title { 
+          font-size: 18.4vw; 
+          line-height: 13vw; 
+          padding-top: 0;
+        }
+        .flower-2 { width: 7vw; height: 7vw; top: 80vh; left: 5vw; }
+        /* Adjusted positions for ultra-wide */
+      }
+    }
+    ```
+    Ultra-wide monitors (21:9)
+  </Tab>
+  <Tab title="Ultra-Wide (2.5 - 3)">
+    ```css globals.css
+    @media (min-aspect-ratio:2.5) {
+      @media (max-aspect-ratio: 3) {
+        .title { 
+          font-size: 12vw; 
+          line-height: 9vw; 
+        }
+        .logoflower {
+          display: none;
+        }
+        /* Further position adjustments */
+      }
+    }
+    ```
+    Super ultra-wide displays (32:9)
+  </Tab>
+  <Tab title="Extreme (> 3)">
+    ```css globals.css
+    @media (min-aspect-ratio: 3) {
+      .title { 
+        font-size: 12vw; 
+        line-height: 9vw; 
+        width: 66%;
+        height: 100%;
+        display: flex;
+        justify-content: center; 
+        align-items: center; 
+      }
+      .flower-4 { 
+        width: 66vh; 
+        height: 66vh; 
+      }
+    }
+    ```
+    Extremely wide setups (3+ aspect ratio)
+  </Tab>
+</Tabs>
+
+<Warning>
+  Aspect ratio-based layouts ensure the sunflower garden remains visually balanced across all monitor configurations, from standard 16:9 to ultra-wide 32:9 displays.
+</Warning>
+
+## Conditional Component Rendering
+
+### Ethos Component Variants
+
+```tsx src/app/page.tsx
+<div id="statement2" className="h-[calc(100dvh)]">
+  {lg && <Ethos />}
+  {!lg &&           
+    <div className="w-[85%] flex flex-col gap-6">
+      <h1 className="font-arya text-dark-green text-tmd">Ethos</h1>
+      <div className="flex flex-col gap-6">
+        <h3>
+          <span className="font-semibold">We often write the first check...</span>
+          <br />
+          We back founders with original insights...
+        </h3>
+        {/* More content */}
+      </div>
+    </div>
+  }
+</div>
+```
+
+<CodeGroup>
+```tsx Desktop (lg >= 1024px)
+<Ethos />
+// Interactive dropdown component
+```
+
+```tsx Mobile (lg < 1024px)
+<div className="flex flex-col gap-6">
+  {/* Static stacked content */}
+</div>
+```
+</CodeGroup>
+
+### Navigation Component Conditional
+
+```tsx src/app/page.tsx
+{!mobile && 
+  <DotNavigator 
+    currentScreen={currentPage} 
+    onDotClick={beforePageChange} 
+    isMobile={isMobile} 
+  />
+}
+```
+
+<Info>
+  Desktop users get dot navigation, while mobile users rely on swipe gestures (handled natively by ReactPageScroller).
+</Info>
+
+## Typography Scaling
+
+Custom font sizes scale across breakpoints:
+
+```ts tailwind.config.ts
+fontSize: {
+  // Titles
+  txl: ['64px', '64px'],
+  tlg: ['56px', '56px'],
+  tmd: ['48px', '48px'],
+  tsm: ['36px', '36px'],
+  
+  // Body
+  b2xl: ['84px', '126px'],
+  bxl: ['64px', '96px'],
+  bxlg: ['46px', '69px'],
+  blg: ['36px', '54px'],
+  bmd: ['32px', '48px'],
+  bsm: ['28px', '42px'],
+  bxsm: ['26px', '39px'],
+  bxs: ['24px', '36px'],
+  b2xs: ['20px', '30px'],
+  b3xs: ['18px', '27px'],
+  b34xs: ['16px', '24px'],
+  b4xs: ['14px', '21px'],
+  b5xs: ['12px', '18px'],
+}
+```
+
+### Responsive Typography Pattern
+
+```tsx
+<h1 className="font-arya text-dark-green
+  text-tmd xl:text-tlg 2xl:text-txl
+">
+  Portfolio
+</h1>
+```
+
+<Steps>
+  <Step title="Base (< xl)">
+    `text-tmd` → 48px/48px
+  </Step>
+  <Step title="Desktop (xl)">
+    `xl:text-tlg` → 56px/56px
+  </Step>
+  <Step title="Large (2xl)">
+    `2xl:text-txl` → 64px/64px
+  </Step>
+</Steps>
+
+## Viewport Height Units
+
+### Dynamic Viewport Height (dvh)
+
+All sections use `calc(100dvh)` for accurate mobile height:
+
+```tsx
+className="h-[calc(100dvh)]"
+```
+
+<Accordion title="Why dvh instead of vh?">
+  - `vh`: Static viewport height, doesn't account for browser chrome
+  - `dvh`: Dynamic viewport height, adjusts for mobile browser UI (address bar, bottom nav)
+  
+  On mobile Safari, the address bar can hide/show, changing available height. `dvh` ensures sections always fill the visible area.
+</Accordion>
+
+### Landscape vs Portrait Height
+
+```tsx src/app/page.tsx
+<div className="landscape:h-screen portrait:h-[calc(100dvh)]">
+```
+
+<CodeGroup>
+```css Landscape
+landscape:h-screen  /* 100vh on desktop */
+```
+
+```css Portrait
+portrait:h-[calc(100dvh)]  /* Dynamic height on mobile */
+```
+</CodeGroup>
+
+## Mobile-Specific Optimizations
+
+### Touch Event Handling
+
+```tsx src/components/PortfolioTable.tsx
+<div
+  onTouchStart={() => setScrollEnabled(false)}
+  onTouchEnd={() => setScrollEnabled(true)}
+>
+```
+
+### Custom Scrollbar Styles
+
+```css globals.css
+.mobile::-webkit-scrollbar {
+  display: none;  /* Hide scrollbars on mobile */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 12px;
+  height: 12px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+```
+
+<Tabs>
+  <Tab title="Mobile">
+    ```tsx
+    className={`overflow-y-auto ${isMobile ? 'mobile' : 'custom-scrollbar'}`}
+    ```
+    No scrollbar chrome for cleaner mobile UI
+  </Tab>
+  <Tab title="Desktop">
+    ```tsx
+    className="overflow-y-auto custom-scrollbar"
+    ```
+    Styled scrollbar with visual feedback
+  </Tab>
+</Tabs>
+
+### Viewport Meta Tag
+
+```tsx src/app/layout.tsx
+<meta
+  name="viewport"
+  content="initial-scale=0.9, width=device-width, height=device-height, viewport-fit=cover, user-scalable=no"
+/>
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+```
+
+<ParamField path="initial-scale" type="0.9">
+  Slightly zoomed out on mobile for better content fit
+</ParamField>
+
+<ParamField path="viewport-fit" type="cover">
+  Extends into safe areas on notched devices (iPhone X+)
+</ParamField>
+
+<ParamField path="user-scalable" type="no">
+  Prevents pinch-zoom for app-like experience
+</ParamField>
+
+## Portfolio Table Responsive Layout
+
+### Filter UI Adaptation
+
+<Tabs>
+  <Tab title="Mobile">
+    ```tsx src/components/PortfolioTable.tsx
+    <div className={`${isMobile ? 'block' : 'hidden'}`}>
+      <select
+        id="industrySelect"
+        className="font-bitter text-sm w-20 p-1 border rounded"
+      >
+        <option value="All">All</option>
+        {industries.map((industry) => (
+          <option key={industry} value={industry}>
+            {industry}
+          </option>
+        ))}
+      </select>
+    </div>
+    ```
+    Compact dropdown selector
+  </Tab>
+  <Tab title="Desktop">
+    ```tsx src/components/PortfolioTable.tsx
+    <div className={`${isMobile ? 'hidden' : 'flex'} flex-wrap gap-2`}>
+      <button onClick={() => changeTable("All")}>
+        <div className={filter === "All" ? "bg-offblack" : "bg-[#6D8A54]"} />
+        All
+      </button>
+      {industries.map((industry) => (
+        <button key={industry} onClick={() => changeTable(industry)}>
+          {industry}
+        </button>
+      ))}
+    </div>
+    ```
+    Full button group with color indicators
+  </Tab>
+</Tabs>
+
+### Table Cell Widths
+
+```tsx src/components/PortfolioTable.tsx
+<td className="
+  w-[117px] xs:w-[122px] md:w-[162px] 
+  lg:w-[234px] xl:w-[244px] 2xl:w-[390px]
+">
+```
+
+<Steps>
+  <Step title="Mobile (< xs)">
+    117px - Minimal width for company names
+  </Step>
+  <Step title="xs (425px)">
+    122px - Slightly wider on large phones
+  </Step>
+  <Step title="md (768px)">
+    162px - Tablet optimization
+  </Step>
+  <Step title="lg (1024px)">
+    234px - Laptop/desktop
+  </Step>
+  <Step title="xl (1440px)">
+    244px - Standard desktop
+  </Step>
+  <Step title="2xl (1920px)">
+    390px - Large displays
+  </Step>
+</Steps>
+
+## Animation Performance
+
+Transitions adapt based on device capabilities:
+
+```tsx src/app/page.tsx
+if (isMobile) {
+  setLoaded(true);  // Immediate on mobile
+} else {
+  setTimeout(() => {
+    setLoaded(true);  // Delayed on desktop for animation
+  }, 500);
+}
+```
+
+<Info>
+  Mobile devices skip the 500ms animation delay to reduce perceived load time and conserve battery.
+</Info>
+
+## Flower Animation System
+
+### Grow Effect (Desktop Only)
+
+```css globals.css
+.grow:hover {
+  transform: scale(1.2);
+}
+```
+
+```tsx src/app/page.tsx
+<div className={`flower flower-2 ${loaded ? '' : 'opacity-0'} grow`}>
+```
+
+### Breathe Animation (Center Flower)
+
+```css globals.css
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.breathe {
+  animation: breathe 3s ease-in-out infinite; 
+}
+```
+
+<Note>
+  Hover effects (`.grow`, `.hover:animate-spin`) only activate on desktop. Mobile users don't have hover capability, so these effects are design enhancements for desktop only.
+</Note>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Runtime Device Detection Sparingly">
+    Rely on CSS media queries when possible. Use `isMobile` only for behavioral differences (events, component variants), not styling.
+  </Accordion>
+  
+  <Accordion title="Combine Orientation and Breakpoints">
+    The `portrait:` and `landscape:` utilities pair well with breakpoints for precise responsive control.
+  </Accordion>
+  
+  <Accordion title="Test Across Aspect Ratios">
+    Don't just test at common resolutions. Verify layouts at 16:9, 21:9, and ultra-wide ratios.
+  </Accordion>
+  
+  <Accordion title="Prefer dvh Over vh">
+    Always use `dvh` for mobile to account for browser chrome. Falls back to `vh` on unsupported browsers.
+  </Accordion>
+  
+  <Accordion title="Optimize Animations for Mobile">
+    Reduce or eliminate animations on mobile to improve performance and battery life.
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Architecture Overview" icon="sitemap" href="/architecture/overview">
+    High-level application structure
+  </Card>
+  <Card title="Page Scrolling" icon="arrows-up-down" href="/architecture/page-scrolling">
+    ReactPageScroller implementation
+  </Card>
+</CardGroup>
