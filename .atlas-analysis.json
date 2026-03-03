@@ -1,0 +1,70 @@
+{
+  "projectType": "frontend",
+  "projectName": "Sunflower Capital",
+  "projectDescription": "An interactive Next.js website showcasing Sunflower Capital's venture capital portfolio, investment philosophy, and founder testimonials with full-page scrolling and animated visuals.",
+  "theme": "palm",
+  "primaryColor": "#03351A",
+  "lightColor": "#6D8A54",
+  "darkColor": "#03351A",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart"
+        ]
+      },
+      {
+        "group": "Core Concepts",
+        "pages": [
+          "architecture/overview",
+          "architecture/page-scrolling",
+          "architecture/responsive-design"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/portfolio-table",
+          "components/testimonials",
+          "components/ethos",
+          "components/footer",
+          "components/dot-navigator"
+        ]
+      },
+      {
+        "group": "Styling",
+        "pages": [
+          "styling/tailwind-configuration",
+          "styling/custom-fonts",
+          "styling/animations"
+        ]
+      },
+      {
+        "group": "Deployment",
+        "pages": [
+          "deployment/vercel",
+          "deployment/analytics"
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Full-page scrolling with ReactPageScroller",
+    "Interactive portfolio filtering by industry",
+    "Testimonial carousel with keyboard navigation",
+    "Responsive flower animation on hero section",
+    "Mobile and desktop optimized layouts",
+    "Custom Tailwind configuration with brand colors",
+    "Vercel Analytics and Google Analytics integration"
+  ],
+  "publicApiSurface": [
+    "PortfolioTable - Filterable company portfolio display",
+    "Testimonials - Carousel component for founder quotes",
+    "Ethos - Dropdown accordion for investment philosophy",
+    "DotNavigator - Page navigation indicator",
+    "DropDown - Reusable accordion component",
+    "Footer - Contact and social links section"
+  ]
+}
